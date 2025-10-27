@@ -1,0 +1,225 @@
+metadata:
+  feature: "init-command"
+  status: "planning"
+  owner: "core"
+  created: "2025-10-26"
+  updated: "2025-10-26"
+
+overview: |
+  The init command sets up the CDD folder structure in a new or existing project.
+  It creates the necessary directories, generates template files, and establishes
+  the foundation for context-driven documentation.
+  
+  This is the entry point for any project wanting to use CDD - it should be
+  simple, safe, and provide immediate value.
+
+capabilities:
+  - "Initialize CDD structure in new projects"
+  - "Safely initialize in existing projects without overwriting files"
+  - "Create starter templates for project and feature specs"
+  - "Generate initial Claude Code command structure"
+  - "Provide clear feedback about what was created"
+
+workflows:
+  - name: "init_new_project"
+    trigger: "User runs 'cdd init project-name'"
+    steps:
+      - "Create project directory if it doesn't exist"
+      - "Create specs/, specs/features/, .claude/commands/, .cddoc/templates/ directories"
+      - "Copy template files into .cddoc/templates/"
+      - "Generate default project.yaml with placeholder content"
+      - "Generate sync-docs.md command"
+      - "Create .cddoc/config.yaml with defaults"
+      - "Display success message with next steps"
+  
+  - name: "init_existing_project"
+    trigger: "User runs 'cdd init .' in existing project"
+    steps:
+      - "Check if CDD structure already exists"
+      - "If exists, ask for confirmation before proceeding"
+      - "Create missing directories only"
+      - "Skip files that already exist (no overwrite)"
+      - "Report what was created vs. what was skipped"
+      - "Validate existing structure if present"
+
+business_rules:
+  - "Never overwrite existing files without explicit confirmation"
+  - "All generated files should have comments indicating they're auto-generated"
+  - "Project name must be valid directory name (lowercase, hyphens allowed)"
+  - "If .git exists, prefer git root as project root"
+  - "Templates should be self-documenting with inline comments"
+  - "Config file should have sensible defaults requiring zero configuration"
+
+edge_cases:
+  - "What if directory already exists with CDD structure?"
+  - "What if user runs init in their home directory by accident?"
+  - "What if specs/ exists but isn't a CDD structure?"
+  - "What if permissions prevent directory creation?"
+  - "What if .claude/ directory exists from previous manual setup?"
+  - "What if user runs init multiple times?"
+  - "What if project name contains invalid characters?"
+
+interfaces:
+  cli_commands:
+    - "cdd init [path] — Initialize CDD structure"
+  
+  arguments:
+    - name: "path"
+      type: "string"
+      required: false
+      default: "."
+      description: "Target directory (creates if doesn't exist, defaults to current dir)"
+  
+  options:
+    - name: "--force"
+      type: "flag"
+      description: "Overwrite existing files (use with caution)"
+    - name: "--minimal"
+      type: "flag"
+      description: "Create only essential structure, skip templates"
+  
+  exit_codes:
+    - code: 0
+      meaning: "Success - structure created"
+    - code: 1
+      meaning: "Error - invalid path or permissions"
+    - code: 2
+      meaning: "Aborted - user declined overwrite"
+
+dependencies:
+  required:
+    - "pathlib — Path manipulation"
+    - "PyYAML — YAML file generation"
+  optional:
+    - "click or argparse — CLI argument parsing"
+    - "rich — Pretty terminal output"
+
+configuration:
+  created_directories:
+    - "specs/"
+    - "specs/features/"
+    - ".claude/commands/"
+    - ".cddoc/"
+    - ".cddoc/templates/"
+  
+  generated_files:
+    - "specs/project.yaml"
+    - ".claude/commands/sync-docs.md"
+    - ".cddoc/config.yaml"
+    - ".cddoc/templates/feature.yaml"
+    - ".cddoc/templates/project.yaml"
+  
+  template_files:
+    project_template: ".cddoc/templates/project.yaml"
+    feature_template: ".cddoc/templates/feature.yaml"
+    config_template: ".cddoc/templates/config.yaml"
+
+security:
+  - "Validate path input to prevent directory traversal attacks"
+  - "Check write permissions before attempting to create files"
+  - "Never execute user input as shell commands"
+  - "Limit path depth to prevent accidental system-wide initialization"
+
+performance:
+  - "Should complete in <1 second for typical projects"
+  - "No external API calls or network requests"
+  - "Minimal file system operations"
+
+implementation_notes: |
+  Key implementation considerations:
+  
+  1. Path Resolution:
+     - Use pathlib for cross-platform compatibility
+     - Resolve relative paths to absolute paths early
+     - Detect git repository root if available
+  
+  2. Safety Checks:
+     - Check if path is suspiciously broad (/, ~/, etc.)
+     - Verify write permissions before starting
+     - Create all directories with exist_ok=True
+  
+  3. Template Content:
+     - Templates should be complete, working examples
+     - Include helpful comments and documentation
+     - Use realistic placeholder values
+  
+  4. User Feedback:
+     - Show clear progress indicators
+     - List exactly what was created
+     - Provide helpful next steps
+     - Use colors/formatting for better readability
+  
+  5. Idempotency:
+     - Running init twice should be safe
+     - Skip existing files, create missing ones
+     - Report what was skipped vs. created
+
+open_questions:
+  - "Should we auto-detect project name from git remote or directory name?"
+  - "Should we offer different templates (Python vs. JS vs. generic)?"
+  - "Should we create a .gitignore entry for .cddoc/cache (future feature)?"
+  - "Should init create a sample feature spec to show the format?"
+  - "Should we integrate with git to auto-commit the initial structure?"
+
+success_metrics:
+  - "User can run 'cdd init .' and have working structure in <5 seconds"
+  - "Generated project.yaml is clear enough to fill out without reading docs"
+  - "First-time users understand next steps from init output"
+  - "No unexpected errors on common operating systems (Linux, macOS, Windows)"
+
+example_usage: |
+  # Initialize new project
+  $ cdd init my-app
+  ✅ Created my-app/ directory
+  ✅ Created specs/ structure
+  ✅ Created .claude/commands/
+  ✅ Generated templates
+  
+  Next steps:
+  1. cd my-app
+  2. Edit specs/project.yaml to describe your project
+  3. Run 'cdd new your-first-feature' to create a feature spec
+  
+  # Initialize existing project
+  $ cd existing-project
+  $ cdd init .
+  ✅ Created specs/features/
+  ⚠️  Skipped specs/project.yaml (already exists)
+  ✅ Created .claude/commands/
+  
+  CDD structure ready! Your existing files were preserved.
+
+test_cases:
+  - scenario: "Init in empty directory"
+    steps:
+      - "Create temp directory"
+      - "Run cdd init ."
+      - "Verify all directories created"
+      - "Verify all template files exist"
+      - "Verify config has valid YAML"
+    expected: "Success, all files created"
+  
+  - scenario: "Init in existing CDD project"
+    steps:
+      - "Create CDD structure manually"
+      - "Add custom content to project.yaml"
+      - "Run cdd init ."
+      - "Verify custom content preserved"
+    expected: "No overwrite, custom content intact"
+  
+  - scenario: "Init with invalid path"
+    steps:
+      - "Run cdd init /root/cant-write-here"
+    expected: "Error with helpful message"
+  
+  - scenario: "Init in git repository"
+    steps:
+      - "Create git repo"
+      - "Run cdd init ."
+      - "Verify structure created at git root"
+    expected: "Success, uses git root as base"
+
+sync_metadata:
+  last_synced: null
+  sync_count: 0
+  last_commit: null
