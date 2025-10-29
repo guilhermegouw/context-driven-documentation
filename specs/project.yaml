@@ -1,0 +1,263 @@
+# Context-Driven Documentation (cddoc) Project Specification
+# This file describes the cddoc project's architecture, constraints, and conventions
+# Last updated: 2025-10-26
+
+project:
+  name: "cddoc"
+  description: |
+    Context-Driven Documentation for AI-assisted development.
+    A tool that bridges structured documentation with AI coding assistants through 
+    Claude Code commands. Converts YAML specs into /commands that provide rich context
+    to AI assistants, and syncs documentation with code changes automatically.
+
+  repository: "https://github.com/guilhermegouw/context-driven-documentation"
+  
+  # Primary programming language(s) and frameworks
+  tech_stack:
+    - language: "Python"
+      version: "3.9+"
+      framework: "Click (CLI)"
+      purpose: "Core implementation and CLI"
+    - language: "YAML"
+      purpose: "Specification format for features and project docs"
+    - library: "Rich"
+      purpose: "Beautiful terminal UI (tables, panels, colors)"
+    - library: "Poetry"
+      purpose: "Dependency management and packaging"
+
+  # Project-wide architectural decisions
+  architecture:
+    style: "modular"
+    description: "CLI tool with modular commands and template system"
+    
+    patterns:
+      - "Command Pattern: Each CLI command is a separate module"
+      - "Template System: YAML templates for generating project structures"
+      - "Plugin Architecture: Future support for custom generators/validators"
+    
+    key_components:
+      - name: "cli.py"
+        purpose: "CLI entry point and command routing"
+      - name: "init.py"
+        purpose: "Project initialization with safety checks"
+      - name: "templates/"
+        purpose: "Built-in YAML and markdown templates"
+
+  # Code conventions and standards
+  conventions:
+    code_style: "PEP 8 with Black formatting (line length: 88)"
+    
+    naming:
+      files: "snake_case (e.g., init.py, sync_docs.py)"
+      classes: "PascalCase (e.g., InitializationError)"
+      functions: "snake_case (e.g., initialize_project)"
+      variables: "snake_case (e.g., target_path, created_files)"
+      constants: "UPPER_SNAKE_CASE (e.g., DANGEROUS_PATHS)"
+    
+    # Testing requirements
+    testing:
+      required: true
+      coverage_minimum: 80
+      frameworks:
+        - "pytest"
+        - "pytest-cov"
+      
+      test_structure: |
+        - Unit tests for each module
+        - Integration tests for CLI commands
+        - Test with temporary directories for file operations
+        - Mock git operations where needed
+    
+    # Documentation requirements
+    documentation:
+      docstrings: "Google style"
+      inline_comments: "Explain why, not what"
+      module_docstrings: "Required for all Python modules"
+      
+      yaml_comments: |
+        - All YAML files should have header comments
+        - Explain purpose and usage
+        - Include examples where helpful
+
+  # Project constraints and non-negotiables
+  constraints:
+    - "Must support Python 3.9+ (wide compatibility)"
+    - "Must work cross-platform (Linux, macOS, Windows)"
+    - "Zero config to start - sensible defaults everywhere"
+    - "YAML-only for MVP (no JSON, TOML, Markdown, etc.)"
+    - "File operations must be safe (no overwrites without --force)"
+    - "Never initialize in system directories (/, /usr, /etc, ~)"
+    - "Must detect git repositories and prefer git root"
+    - "CLI output must be beautiful and informative (use Rich)"
+    - "Commands must be idempotent (safe to run multiple times)"
+
+  # Design principles
+  design_principles:
+    - "Bootstrap-friendly: Use CDD to document CDD itself (dogfooding)"
+    - "Developer experience first: Beautiful CLI, clear errors, helpful messages"
+    - "Safe by default: Never surprise the user, ask before destructive operations"
+    - "Git-aware: Detect and respect repository structure"
+    - "Progressive disclosure: Start simple, add complexity as needed"
+    - "Opinionated but flexible: One way to do things, but allow overrides"
+    - "Human-in-the-loop: AI suggests, human approves"
+
+  # Key directories and their purposes
+  structure:
+    src/cddoc: "Main package code (CLI, commands, utilities)"
+    src/cddoc/templates: "Built-in templates (copied to user projects)"
+    specs: "Feature specifications (dogfooding - CDD documenting itself)"
+    specs/features: "Individual feature specs (init-command.yaml, etc.)"
+    tests: "Test suite (pytest-based)"
+    .claude/commands: "Generated Claude Code commands (for using CDD with Claude)"
+    .cddoc: "CDD configuration and templates (in user projects)"
+
+  # Dependencies and their purposes
+  dependencies:
+    core:
+      - name: "pyyaml"
+        version: "^6.0.1"
+        purpose: "YAML parsing and generation for specs"
+      - name: "click"
+        version: "^8.1.7"
+        purpose: "CLI framework with decorators and argument parsing"
+      - name: "rich"
+        version: "^13.7.0"
+        purpose: "Beautiful terminal output (tables, panels, colors, progress)"
+    
+    dev:
+      - name: "pytest"
+        version: "^7.4.3"
+        purpose: "Testing framework"
+      - name: "pytest-cov"
+        version: "^4.1.0"
+        purpose: "Code coverage reporting"
+      - name: "black"
+        version: "^23.12.1"
+        purpose: "Code formatting (automatic PEP 8)"
+      - name: "ruff"
+        version: "^0.1.9"
+        purpose: "Fast Python linter (replaces flake8, isort, etc.)"
+
+  # Common gotchas and pitfalls
+  gotchas:
+    - "Source templates are in src/cddoc/templates/ NOT .cddoc/templates/"
+    - "Git root detection might surprise users working in subdirectories"
+    - "YAML anchors/references not supported in specs (keep it simple)"
+    - "Feature names must be lowercase with hyphens (will be validated)"
+    - "When testing, use temporary directories to avoid polluting project"
+    - "Rich emoji rendering depends on terminal font support"
+    - "Path.resolve() is essential - always work with absolute paths"
+
+  # Current development status
+  status:
+    version: "0.1.0"
+    phase: "MVP Development (Phase 1)"
+    
+    completed:
+      - "✅ Poetry setup and project structure"
+      - "✅ CLI entry point with Click"
+      - "✅ cdd init command (full implementation)"
+      - "✅ Template system with YAML files"
+      - "✅ Git root detection"
+      - "✅ Safety checks (dangerous paths, permissions)"
+      - "✅ Beautiful Rich UI (tables, panels)"
+      - "✅ First feature spec (init-command.yaml)"
+    
+    in_progress:
+      - "🚧 cdd new command (create feature specs)"
+      - "🚧 cdd generate command (YAML → markdown commands)"
+    
+    planned:
+      - "📋 cdd validate command (schema validation)"
+      - "📋 cdd status command (doc health dashboard)"
+      - "📋 cdd sync command (update docs from code changes)"
+
+  # Integration with Claude Code
+  claude_code_integration:
+    commands_directory: ".claude/commands"
+    
+    command_format: |
+      Each .md file becomes a /command in Claude Code.
+      Commands load context from YAML specs to guide development.
+    
+    workflow: |
+      1. Create spec: specs/features/my-feature.yaml
+      2. Generate command: cdd generate → .claude/commands/my-feature.md
+      3. Use in Claude: /my-feature → loads context
+      4. After coding: cdd sync my-feature → updates spec
+    
+    built_in_commands:
+      - name: "sync-docs"
+        purpose: "Load all project and feature specs into context"
+        usage: "/sync-docs"
+
+# AI Assistant Guidelines
+# ======================
+# When implementing features for cddoc:
+
+implementation_guidelines:
+  code_quality:
+    - "Follow PEP 8 with Black formatting"
+    - "Add type hints to all function signatures"
+    - "Write Google-style docstrings for all public functions"
+    - "Handle errors gracefully with try/except and custom exceptions"
+    - "Use pathlib.Path for all file operations (cross-platform)"
+    - "Always resolve paths to absolute before operations"
+  
+  safety:
+    - "Validate all user input (paths, names, etc.)"
+    - "Check write permissions before file operations"
+    - "Never overwrite files without explicit permission"
+    - "Provide clear error messages with actionable suggestions"
+    - "Exit with proper exit codes (0=success, 1=error, 2=user abort)"
+  
+  user_experience:
+    - "Use Rich for all CLI output (no plain print statements)"
+    - "Show progress with tables and panels"
+    - "Use emojis for visual cues (✅ ❌ ⚠️ ℹ️)"
+    - "Provide 'next steps' guidance after operations"
+    - "Make error messages helpful, not cryptic"
+  
+  testing:
+    - "Write tests for every new function"
+    - "Use pytest fixtures for common test setup"
+    - "Test with temporary directories (no side effects)"
+    - "Mock subprocess calls (git commands)"
+    - "Aim for 80%+ code coverage"
+  
+  documentation:
+    - "Update specs when adding features"
+    - "Keep docstrings in sync with code"
+    - "Add inline comments for complex logic"
+    - "Update README with new commands"
+
+# When using this with Claude Code:
+# =================================
+# 1. Load context with: /sync-docs
+# 2. Reference this project.yaml when making architectural decisions
+# 3. Check constraints before suggesting solutions
+# 4. Follow naming conventions in all generated code
+# 5. Respect the tech stack (Python 3.9+, Click, Rich, YAML)
+# 6. Always consider cross-platform compatibility
+# 7. Maintain the "safe by default" principle
+# 8. Keep the beautiful CLI aesthetic with Rich
+
+# Development Workflow:
+# ====================
+# 1. Create feature spec in specs/features/{feature}.yaml
+# 2. Create manual command in .claude/commands/{feature}.md
+# 3. Use /command in Claude Code to guide implementation
+# 4. Implement in src/cddoc/{feature}.py
+# 5. Add CLI command in cli.py
+# 6. Write tests in tests/test_{feature}.py
+# 7. Once cdd generate works: verify auto-generation matches manual command
+
+# Bootstrap Validation:
+# ====================
+# Success criteria: When cdd generate creates .claude/commands/init-command.md
+# that matches the manually created version, the bootstrap loop is closed!
+
+---
+# Meta Note: This file itself is an example of Context-Driven Documentation
+# It was created using the methodology it describes (bootstrap approach)
+# Last updated: 2025-10-26
