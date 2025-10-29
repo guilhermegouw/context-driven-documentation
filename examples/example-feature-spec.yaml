@@ -1,0 +1,57 @@
+# Example Feature Ticket Specification
+# This demonstrates what Socrates can help you create through conversation
+
+title: User Authentication System
+
+user_story: |
+  As a platform administrator,
+  I want to implement secure user authentication,
+  So that users can safely access their personal data and only authorized users can perform sensitive operations.
+
+business_value: |
+  User authentication is fundamental for data security and user privacy. Without proper authentication,
+  we cannot protect user data or provide personalized experiences.
+
+  Business Impact: Enables user accounts, personalization, and data privacy compliance (GDPR, etc.)
+
+acceptance_criteria:
+  - Users can register with email and password
+  - Users can log in with valid credentials
+  - Passwords are securely hashed and stored
+  - Invalid login attempts are handled gracefully
+  - Users can reset forgotten passwords via email
+  - Session management keeps users logged in appropriately
+  - Authentication state persists across browser sessions
+
+implementation_scope:
+  frontend:
+    - Login form component with validation
+    - Registration form with password strength indicator
+    - Password reset flow UI
+    - Session state management
+  backend:
+    - User registration API endpoint
+    - Login authentication endpoint
+    - Password hashing with bcrypt
+    - JWT token generation and validation
+    - Password reset token generation
+    - Email service integration
+  database:
+    - Users table with email, hashed_password, created_at
+    - Password reset tokens table
+    - User sessions table
+
+technical_considerations: |
+  - Use bcrypt for password hashing (industry standard)
+  - Implement rate limiting to prevent brute force attacks
+  - JWT tokens should expire after 24 hours
+  - Password reset tokens expire after 1 hour
+  - Consider implementing 2FA in future iteration
+  - Ensure HTTPS is enforced for all auth endpoints
+
+ticket:
+  type: feature
+  created: '2025-10-29'
+  updated: '2025-10-29'
+  priority: high
+  estimated_effort: 5-8 hours

@@ -1,0 +1,45 @@
+# Feature Ticket Template
+# This template shows the structure Socrates uses for feature specifications
+
+title: "[Descriptive feature title]"
+
+user_story: |
+  As a [type of user],
+  I want [capability or feature],
+  So that [benefit or value].
+
+business_value: |
+  [Why this feature matters to the business]
+
+  Business Impact: [Measurable impact - revenue, users, efficiency, etc.]
+
+acceptance_criteria:
+  - [Specific, testable criterion 1]
+  - [Specific, testable criterion 2]
+  - [Specific, testable criterion 3]
+  # Add as many as needed to define "done"
+
+implementation_scope:
+  frontend:
+    - [UI component or change 1]
+    - [UI component or change 2]
+  backend:
+    - [API endpoint or service 1]
+    - [API endpoint or service 2]
+  database:
+    - [Schema change or data model 1]
+    - [Schema change or data model 2]
+
+technical_considerations: |
+  [Important technical aspects the team should know]
+  - Performance implications
+  - Security concerns
+  - Dependencies on other systems
+  - Risks or challenges
+
+ticket:
+  type: feature
+  priority: [high/medium/low]
+  estimated_effort: [time estimate]
+  created: [auto-generated]
+  updated: [auto-generated]

@@ -20,16 +20,16 @@ def main():
 
 
 @main.command()
-@click.argument('path', default='.')
+@click.argument("path", default=".")
 @click.option(
-    '--force',
+    "--force",
     is_flag=True,
-    help='Overwrite existing files (use with caution)',
+    help="Overwrite existing files (use with caution)",
 )
 @click.option(
-    '--minimal',
+    "--minimal",
     is_flag=True,
-    help='Create only essential structure, skip templates',
+    help="Create only essential structure, skip templates",
 )
 def init(path, force, minimal):
     """Initialize CDD structure in a project.
@@ -58,7 +58,7 @@ def init(path, force, minimal):
 
         # Show next steps
         console.print()
-        _display_next_steps(result['path'])
+        _display_next_steps(result["path"])
 
         sys.exit(0)
 
@@ -76,9 +76,9 @@ def _display_results(result: dict):
     Args:
         result: Dictionary containing initialization results
     """
-    created_dirs = result.get('created_dirs', [])
-    created_files = result.get('created_files', [])
-    skipped_files = result.get('skipped_files', [])
+    created_dirs = result.get("created_dirs", [])
+    created_files = result.get("created_files", [])
+    skipped_files = result.get("skipped_files", [])
 
     # Create summary table
     table = Table(title="Initialization Summary", show_header=True)
@@ -113,29 +113,32 @@ def _display_next_steps(project_path):
     """
     next_steps = """[bold]Next Steps:[/bold]
 
-1. 📝 Edit [cyan]specs/project.yaml[/cyan] to describe your project
-   - Update project name and description
-   - Define your tech stack and architecture
-   - Set code conventions and standards
+1. 📝 Complete your project constitution in [cyan]CLAUDE.md[/cyan]
+   - In Claude Code, run: [cyan]/socrates CLAUDE.md[/cyan]
+   - Have a natural conversation with Socrates AI
+   - Your constitution will be built through dialogue
 
-2. 🎯 Create your first feature spec:
-   [cyan]cdd new your-first-feature[/cyan]
+2. 🎯 Create your first ticket specification:
+   - In Claude Code, run: [cyan]/socrates specs/tickets/your-feature/spec.yaml[/cyan]
+   - Socrates will guide you through documenting your feature
 
-3. 🤖 Use with Claude Code:
-   Run [cyan]/sync-docs[/cyan] to load specs into context
+3. 🤖 Start development with full context (coming soon):
+   - Use your completed specs to build features
+   - AI will have complete project context from your documentation
 
 4. 📚 Learn more:
-   Visit [link]https://github.com/guilhermegouw/context-driven-documentation[/link]
+   - Check [cyan]examples/SOCRATES_GUIDE.md[/cyan] for detailed usage
+   - Visit [link]https://github.com/guilhermegouw/context-driven-documentation[/link]
 """
 
     console.print(
         Panel(
             next_steps,
-            title="🎉 CDD Initialized Successfully!",
+            title="🎉 CDD Framework Initialized Successfully!",
             border_style="green",
         )
     )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

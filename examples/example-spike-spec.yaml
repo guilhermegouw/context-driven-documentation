@@ -1,0 +1,57 @@
+# Example Spike (Research) Ticket Specification
+# This demonstrates what Socrates can help you create for research tasks
+
+title: Investigate Real-time Collaboration Technologies
+
+research_questions:
+  - What are the leading real-time collaboration libraries/frameworks available?
+  - How do WebSockets compare to Server-Sent Events for our use case?
+  - What are the scalability implications of each approach?
+  - What would be the implementation effort for each option?
+  - How do these technologies handle connection drops and reconnection?
+
+investigation_approach: |
+  1. Research and compare popular technologies:
+     - Socket.io
+     - WebSockets native API
+     - Server-Sent Events (SSE)
+     - Long polling (fallback approach)
+
+  2. Create proof-of-concept implementations:
+     - Build minimal demo with Socket.io
+     - Build minimal demo with native WebSockets
+     - Test with multiple concurrent connections
+
+  3. Performance testing:
+     - Measure latency with 10, 100, 1000 concurrent users
+     - Test connection stability over time
+     - Evaluate resource usage on server
+
+  4. Integration assessment:
+     - Review compatibility with current tech stack
+     - Evaluate deployment complexity
+     - Consider scalability requirements
+
+success_criteria: |
+  This spike is successful when we have:
+  - A comprehensive comparison document of the technologies
+  - Working proof-of-concept implementations
+  - Performance benchmark results
+  - Clear recommendation for which technology to use
+  - Estimated implementation effort for full integration
+
+timebox: 2 days
+
+expected_deliverables:
+  - Technical comparison document (markdown)
+  - Proof-of-concept code samples
+  - Performance test results
+  - Recommendation document with rationale
+  - Implementation roadmap estimate
+
+ticket:
+  type: spike
+  created: '2025-10-29'
+  updated: '2025-10-29'
+  priority: medium
+  assigned_to: Tech lead / Senior developer

@@ -1,0 +1,34 @@
+# Example Bug Ticket Specification
+# This demonstrates what Socrates can help you create for bug tracking
+
+title: Login Form Fails on Safari Browser
+
+problem_description: |
+  **Current Behavior:**
+  When users try to log in using Safari browser (version 16+), the login form
+  submission fails silently. The form appears to submit, but no authentication
+  occurs and no error message is displayed.
+
+  **Expected Behavior:**
+  Login should work consistently across all major browsers including Safari.
+  If login fails, users should see a clear error message.
+
+reproduction_steps:
+  - Open the application in Safari 16+ on macOS
+  - Navigate to the login page at /login
+  - Enter valid credentials (email and password)
+  - Click the "Log In" button
+  - Observe that the form appears to submit but nothing happens
+  - Check browser console - see CORS error message
+
+impact_assessment:
+  severity: high
+  affected_users: All users accessing the platform via Safari (approximately 15% of user base)
+  workaround: Users can access the platform using Chrome, Firefox, or Edge browsers
+
+ticket:
+  type: bug
+  created: '2025-10-29'
+  updated: '2025-10-29'
+  priority: high
+  reported_by: Customer support team
