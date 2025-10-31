@@ -68,6 +68,134 @@ features:
   agent_system: false
 """
 
+# Template file mappings
+TICKET_TEMPLATES = {
+    "feature-ticket-template.yaml": """# Feature Ticket Template
+# This template shows the structure Socrates uses for feature specifications
+
+title: "[Descriptive feature title]"
+
+user_story: |
+  As a [type of user],
+  I want [capability or feature],
+  So that [benefit or value].
+
+business_value: |
+  [Why this feature matters to the business]
+
+  Business Impact: [Measurable impact - revenue, users, efficiency, etc.]
+
+acceptance_criteria:
+  - [Specific, testable criterion 1]
+  - [Specific, testable criterion 2]
+  - [Specific, testable criterion 3]
+  # Add as many as needed to define "done"
+
+implementation_scope:
+  frontend:
+    - [UI component or change 1]
+    - [UI component or change 2]
+  backend:
+    - [API endpoint or service 1]
+    - [API endpoint or service 2]
+  database:
+    - [Schema change or data model 1]
+    - [Schema change or data model 2]
+
+technical_considerations: |
+  [Important technical aspects the team should know]
+  - Performance implications
+  - Security concerns
+  - Dependencies on other systems
+  - Risks or challenges
+
+ticket:
+  type: feature
+  priority: [high/medium/low]
+  estimated_effort: [time estimate]
+  created: [auto-generated]
+  updated: [auto-generated]
+""",
+    "bug-ticket-template.yaml": """# Bug Ticket Template
+# This template shows the structure Socrates uses for bug reports
+
+title: "[Clear description of the bug]"
+
+problem_description: |
+  **Current Behavior:**
+  [What is happening that shouldn't be]
+
+  **Expected Behavior:**
+  [What should be happening instead]
+
+reproduction_steps:
+  - [Step 1 to reproduce]
+  - [Step 2 to reproduce]
+  - [Step 3 to reproduce]
+  # Continue until bug is reproduced
+
+impact_assessment:
+  severity: [critical/high/medium/low]
+  affected_users: [Who is impacted - all users, specific role, percentage]
+  workaround: [Available workaround, or "None known"]
+  business_impact: [How this affects business operations]
+
+environment:
+  browser: [If applicable]
+  os: [If applicable]
+  version: [Application version where bug occurs]
+
+ticket:
+  type: bug
+  priority: [critical/high/medium/low]
+  created: [auto-generated]
+  updated: [auto-generated]
+  reported_by: [Who reported this]
+""",
+    "spike-ticket-template.yaml": """# Spike Ticket Template
+# This template shows the structure Socrates uses for research/investigation tickets
+
+title: "[Research topic or investigation focus]"
+
+research_questions:
+  - [Key question 1 we need to answer]
+  - [Key question 2 we need to answer]
+  - [Key question 3 we need to answer]
+  # Focus on what we need to learn
+
+investigation_approach: |
+  [How we will conduct this research]
+
+  Methods:
+  - [Investigation method 1]
+  - [Investigation method 2]
+
+  Deliverables:
+  - [What we'll produce - document, POC, recommendation, etc.]
+
+success_criteria: |
+  [How we'll know this spike is complete]
+
+  This spike is successful when:
+  - [Criterion 1]
+  - [Criterion 2]
+
+timebox: [Time limit - e.g., "2 days", "8 hours"]
+
+context: |
+  [Why we need this research]
+  [What decision this will inform]
+
+ticket:
+  type: spike
+  priority: [high/medium/low]
+  created: [auto-generated]
+  updated: [auto-generated]
+  assigned_to: [Who will do the research]
+""",
+}
+
+
 # Dangerous system paths that should never be initialized
 DANGEROUS_PATHS = [
     "/",
@@ -264,6 +392,16 @@ def create_minimal_files(base_path: Path) -> Tuple[List[str], List[str]]:
         created.append(".cddoc/config.yaml")
     else:
         skipped.append(".cddoc/config.yaml")
+
+    # Create ticket templates
+    templates_dir = base_path / ".cddoc" / "templates"
+    for template_name, template_content in TICKET_TEMPLATES.items():
+        template_path = templates_dir / template_name
+        if not template_path.exists():
+            template_path.write_text(template_content)
+            created.append(f".cddoc/templates/{template_name}")
+        else:
+            skipped.append(f".cddoc/templates/{template_name}")
 
     return created, skipped
 

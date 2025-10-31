@@ -1,13 +1,14 @@
 """Tests for init module."""
 
-import pytest
 from pathlib import Path
+
+import pytest
 from cddoc.init import (
-    initialize_project,
     InitializationError,
     check_existing_structure,
     create_directory_structure,
     create_minimal_files,
+    initialize_project,
     is_dangerous_path,
     validate_path,
 )
@@ -31,17 +32,29 @@ def test_initialize_project_creates_structure(tmp_path):
     ]
 
     for dir_path in expected_dirs:
-        assert (tmp_path / dir_path).exists(), f"Directory {dir_path} should exist"
-        assert (tmp_path / dir_path).is_dir(), f"{dir_path} should be a directory"
+        assert (
+            tmp_path / dir_path
+        ).exists(), f"Directory {dir_path} should exist"
+        assert (
+            tmp_path / dir_path
+        ).is_dir(), f"{dir_path} should be a directory"
 
     # Check files
-    expected_files = ["CLAUDE.md", ".cddoc/config.yaml"]
+    expected_files = [
+        "CLAUDE.md",
+        ".cddoc/config.yaml",
+        ".cddoc/templates/feature-ticket-template.yaml",
+        ".cddoc/templates/bug-ticket-template.yaml",
+        ".cddoc/templates/spike-ticket-template.yaml",
+    ]
 
     for file_path in expected_files:
         assert (
             tmp_path / file_path
         ).exists(), f"File {file_path} should exist"
-        assert (tmp_path / file_path).is_file(), f"{file_path} should be a file"
+        assert (
+            tmp_path / file_path
+        ).is_file(), f"{file_path} should be a file"
 
     # Verify result structure
     assert result["path"] == tmp_path
@@ -87,12 +100,16 @@ def test_initialize_existing_structure(tmp_path):
     """Test that initialization handles existing structure gracefully."""
     # First initialization
     result1 = initialize_project(str(tmp_path))
-    assert len(result1["created_files"]) == 2
+    assert (
+        len(result1["created_files"]) == 5
+    )  # CLAUDE.md + config.yaml + 3 templates
 
     # Second initialization should skip existing files
     result2 = initialize_project(str(tmp_path))
     assert len(result2["created_files"]) == 0
-    assert len(result2["skipped_files"]) == 2
+    assert (
+        len(result2["skipped_files"]) == 5
+    )  # CLAUDE.md + config.yaml + 3 templates
     assert result2["existing_structure"] is True
 
 
@@ -150,12 +167,16 @@ def test_create_minimal_files(tmp_path):
     """Test create_minimal_files creates required files."""
     # Create .cddoc directory first
     (tmp_path / ".cddoc").mkdir()
+    (tmp_path / ".cddoc" / "templates").mkdir()
 
     created, skipped = create_minimal_files(tmp_path)
 
-    assert len(created) == 2
+    assert len(created) == 5
     assert "CLAUDE.md" in created
     assert ".cddoc/config.yaml" in created
+    assert ".cddoc/templates/feature-ticket-template.yaml" in created
+    assert ".cddoc/templates/bug-ticket-template.yaml" in created
+    assert ".cddoc/templates/spike-ticket-template.yaml" in created
     assert len(skipped) == 0
 
     assert (tmp_path / "CLAUDE.md").exists()
@@ -166,15 +187,28 @@ def test_create_minimal_files_skips_existing(tmp_path):
     """Test create_minimal_files skips existing files."""
     # Create .cddoc directory and files
     (tmp_path / ".cddoc").mkdir()
+    (tmp_path / ".cddoc" / "templates").mkdir()
     (tmp_path / "CLAUDE.md").write_text("existing")
     (tmp_path / ".cddoc" / "config.yaml").write_text("existing")
+    (
+        tmp_path / ".cddoc" / "templates" / "feature-ticket-template.yaml"
+    ).write_text("existing")
+    (
+        tmp_path / ".cddoc" / "templates" / "bug-ticket-template.yaml"
+    ).write_text("existing")
+    (
+        tmp_path / ".cddoc" / "templates" / "spike-ticket-template.yaml"
+    ).write_text("existing")
 
     created, skipped = create_minimal_files(tmp_path)
 
     assert len(created) == 0
-    assert len(skipped) == 2
+    assert len(skipped) == 5
     assert "CLAUDE.md" in skipped
     assert ".cddoc/config.yaml" in skipped
+    assert ".cddoc/templates/feature-ticket-template.yaml" in skipped
+    assert ".cddoc/templates/bug-ticket-template.yaml" in skipped
+    assert ".cddoc/templates/spike-ticket-template.yaml" in skipped
 
 
 def test_is_dangerous_path():
@@ -257,7 +291,9 @@ def test_files_have_correct_content_structure(tmp_path):
         "## Team Conventions",
     ]
     for section in sections:
-        assert section in content, f"Section '{section}' missing from CLAUDE.md"
+        assert (
+            section in content
+        ), f"Section '{section}' missing from CLAUDE.md"
 
     # config.yaml should have all top-level keys
     config_yaml = tmp_path / ".cddoc" / "config.yaml"

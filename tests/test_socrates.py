@@ -5,7 +5,6 @@ from pathlib import Path
 
 import pytest
 import yaml
-
 from cddoc.handlers import ConstitutionHandler, TicketSpecHandler
 from cddoc.socrates import SocratesError, create_file_handler
 
@@ -101,14 +100,14 @@ class TestTicketSpecHandler:
                 "ticket": {"type": "feature"},
             }
 
-            with open(temp_path, 'w') as f:
+            with open(temp_path, "w") as f:
                 yaml.dump(yaml_content, f)
 
             file_data = handler.read_current_content(temp_path)
 
-            assert file_data['content']['title'] == "Test Feature"
-            assert file_data['is_new'] is False
-            assert file_data['ticket_type'] == 'feature'
+            assert file_data["content"]["title"] == "Test Feature"
+            assert file_data["is_new"] is False
+            assert file_data["ticket_type"] == "feature"
 
     def test_read_nonexistent_file(self):
         """Should handle non-existent file gracefully."""
@@ -119,9 +118,9 @@ class TestTicketSpecHandler:
 
             file_data = handler.read_current_content(path)
 
-            assert file_data['content'] == {}
-            assert file_data['is_new'] is True
-            assert 'ticket_type' in file_data
+            assert file_data["content"] == {}
+            assert file_data["is_new"] is True
+            assert "ticket_type" in file_data
 
     def test_update_file_creates_valid_yaml(self):
         """Should create valid YAML with proper structure."""
@@ -131,34 +130,34 @@ class TestTicketSpecHandler:
             path = Path(tmpdir) / "spec.yaml"
 
             conversation_data = {
-                'content': {
-                    'title': 'Test Feature',
-                    'user_story': 'As a user, I want...',
+                "content": {
+                    "title": "Test Feature",
+                    "user_story": "As a user, I want...",
                 },
-                'updates': [
+                "updates": [
                     {
-                        'section': 'title',
-                        'action': 'Added',
-                        'preview': 'Test Feature',
+                        "section": "title",
+                        "action": "Added",
+                        "preview": "Test Feature",
                     }
                 ],
-                'ticket_type': 'feature',
+                "ticket_type": "feature",
             }
 
             results = handler.update_file(path, conversation_data)
 
             assert path.exists()
-            assert results['file_path'] == str(path)
-            assert len(results['updates']) > 0
-            assert len(results['next_steps']) > 0
+            assert results["file_path"] == str(path)
+            assert len(results["updates"]) > 0
+            assert len(results["next_steps"]) > 0
 
             # Verify YAML is valid
-            with open(path, 'r') as f:
+            with open(path, "r") as f:
                 saved_content = yaml.safe_load(f)
-                assert saved_content['title'] == 'Test Feature'
-                assert saved_content['ticket']['type'] == 'feature'
-                assert 'created' in saved_content['ticket']
-                assert 'updated' in saved_content['ticket']
+                assert saved_content["title"] == "Test Feature"
+                assert saved_content["ticket"]["type"] == "feature"
+                assert "created" in saved_content["ticket"]
+                assert "updated" in saved_content["ticket"]
 
 
 class TestConstitutionHandler:
@@ -189,7 +188,7 @@ Tech stack details here.
         handler = ConstitutionHandler()
 
         with tempfile.NamedTemporaryFile(
-            mode='w', suffix='.md', delete=False
+            mode="w", suffix=".md", delete=False
         ) as f:
             # Write more than 100 characters to be considered "not new"
             content = """# Project Constitution
@@ -207,9 +206,9 @@ Python, Click, Rich, PyYAML
         try:
             file_data = handler.read_current_content(temp_path)
 
-            assert file_data['is_new'] is False
-            assert "Project Overview" in file_data['sections']
-            assert "Technology Stack & Constraints" in file_data['sections']
+            assert file_data["is_new"] is False
+            assert "Project Overview" in file_data["sections"]
+            assert "Technology Stack & Constraints" in file_data["sections"]
         finally:
             temp_path.unlink()
 
@@ -218,7 +217,7 @@ Python, Click, Rich, PyYAML
         handler = ConstitutionHandler()
 
         with tempfile.NamedTemporaryFile(
-            mode='w', suffix='.md', delete=False
+            mode="w", suffix=".md", delete=False
         ) as f:
             f.write("")
             temp_path = Path(f.name)
@@ -226,8 +225,8 @@ Python, Click, Rich, PyYAML
         try:
             file_data = handler.read_current_content(temp_path)
 
-            assert file_data['is_new'] is True
-            assert file_data['sections'] == {}
+            assert file_data["is_new"] is True
+            assert file_data["sections"] == {}
         finally:
             temp_path.unlink()
 
@@ -239,15 +238,15 @@ Python, Click, Rich, PyYAML
             path = Path(tmpdir) / "CLAUDE.md"
 
             conversation_data = {
-                'sections': {
-                    'Project Overview': 'Test project overview',
-                    'Technology Stack & Constraints': 'Python, Click, Rich',
+                "sections": {
+                    "Project Overview": "Test project overview",
+                    "Technology Stack & Constraints": "Python, Click, Rich",
                 },
-                'updates': [
+                "updates": [
                     {
-                        'section': 'Project Overview',
-                        'action': 'Added',
-                        'preview': 'Test project',
+                        "section": "Project Overview",
+                        "action": "Added",
+                        "preview": "Test project",
                     }
                 ],
             }
@@ -255,8 +254,8 @@ Python, Click, Rich, PyYAML
             results = handler.update_file(path, conversation_data)
 
             assert path.exists()
-            assert results['file_path'] == str(path)
-            assert len(results['next_steps']) > 0
+            assert results["file_path"] == str(path)
+            assert len(results["next_steps"]) > 0
 
             # Verify markdown structure
             content = path.read_text()

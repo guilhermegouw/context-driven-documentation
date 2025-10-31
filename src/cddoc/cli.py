@@ -8,6 +8,7 @@ from rich.panel import Panel
 from rich.table import Table
 
 from .init import InitializationError, initialize_project
+from .new_ticket import TicketCreationError, create_new_ticket
 
 console = Console()
 
@@ -135,6 +136,110 @@ def _display_next_steps(project_path):
         Panel(
             next_steps,
             title="🎉 CDD Framework Initialized Successfully!",
+            border_style="green",
+        )
+    )
+
+
+@main.command()
+@click.argument(
+    "ticket_type",
+    type=click.Choice(["feature", "bug", "spike"], case_sensitive=False),
+)
+@click.argument("name")
+def new(ticket_type, name):
+    """Create a new ticket specification file.
+
+    TICKET_TYPE: Type of ticket (feature, bug, or spike)
+    NAME: Name for the ticket (will be auto-normalized)
+
+    Examples:
+        cdd new feature user-authentication
+        cdd new bug "Payment Processing Error"
+        cdd new spike api_performance_investigation
+
+    The command will:
+    - Normalize the name to lowercase-with-dashes format
+    - Create specs/tickets/<type>-<name>/spec.yaml
+    - Populate template with current date
+    - Show you the next steps
+    """
+    console.print(
+        Panel.fit(
+            f"🎫 [bold]Creating {ticket_type.title()} Ticket[/bold]",
+            border_style="blue",
+        )
+    )
+
+    try:
+        # Create the ticket
+        result = create_new_ticket(ticket_type.lower(), name)
+
+        # Display success
+        console.print()
+        _display_ticket_success(result)
+
+        sys.exit(0)
+
+    except TicketCreationError as e:
+        console.print(f"\n[red]❌ Error:[/red] {e}")
+        sys.exit(1)
+    except Exception as e:
+        console.print(f"\n[red]❌ Unexpected error:[/red] {e}")
+        sys.exit(1)
+
+
+def _display_ticket_success(result: dict):
+    """Display ticket creation success message.
+
+    Args:
+        result: Dictionary containing creation results
+    """
+    ticket_path = result["ticket_path"]
+    normalized_name = result["normalized_name"]
+    ticket_type = result["ticket_type"]
+    overwritten = result["overwritten"]
+
+    # Create status message
+    status = "Overwritten" if overwritten else "Created"
+
+    # Show creation summary
+    table = Table(title=f"{status} Successfully", show_header=True)
+    table.add_column("Field", style="cyan")
+    table.add_column("Value", style="green")
+
+    table.add_row("Type", ticket_type.title())
+    table.add_row("Normalized Name", normalized_name)
+    table.add_row("Location", str(ticket_path))
+    table.add_row("Spec File", str(ticket_path / "spec.yaml"))
+
+    console.print(table)
+
+    # Show next steps
+    next_steps = f"""[bold]Next Steps:[/bold]
+
+1. 📝 Fill out your ticket specification:
+   - In Claude Code, run: [cyan]/socrates {ticket_path / "spec.yaml"}[/cyan]
+   - Have a natural conversation with Socrates AI
+   - Your specification will be built through dialogue
+
+2. 🎯 Review the generated spec:
+   - Open: [cyan]{ticket_path / "spec.yaml"}[/cyan]
+   - Ensure all sections are complete and accurate
+
+3. 🚀 Start implementation:
+   - Use the spec as context for AI-assisted development
+   - Claude will understand your requirements from the spec
+
+4. 📚 Learn more:
+   - Visit [link]https://github.com/guilhermegouw/context-driven-documentation[/link]
+"""
+
+    console.print()
+    console.print(
+        Panel(
+            next_steps,
+            title="🎉 Ticket Created Successfully!",
             border_style="green",
         )
     )
