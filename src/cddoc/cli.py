@@ -223,13 +223,15 @@ def _display_ticket_success(result: dict):
    - Have a natural conversation with Socrates AI
    - Your specification will be built through dialogue
 
-2. 🎯 Review the generated spec:
-   - Open: [cyan]{ticket_path / "spec.yaml"}[/cyan]
-   - Ensure all sections are complete and accurate
+2. 🎯 Generate implementation plan:
+   - In Claude Code, run: [cyan]/plan {ticket_path / "spec.yaml"}[/cyan]
+   - Planner will analyze your spec and create a detailed plan
+   - Review the generated plan: [cyan]{ticket_path / "plan.md"}[/cyan]
 
 3. 🚀 Start implementation:
-   - Use the spec as context for AI-assisted development
-   - Claude will understand your requirements from the spec
+   - Use the plan.md as your implementation guide
+   - Claude will have full context from spec + plan
+   - Build with confidence!
 
 4. 📚 Learn more:
    - Visit [link]https://github.com/guilhermegouw/context-driven-documentation[/link]

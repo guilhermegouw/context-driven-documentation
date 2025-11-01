@@ -1,0 +1,89 @@
+title: "Software Architect Expert - Implementation Plan Generator (/plan command)"
+
+user_story: |
+  As a software developer using the CDD Framework,
+  I want to run `/plan spec.yaml` to automatically generate a detailed implementation plan,
+  So that another AI instance (or I) can implement the feature with minimal ambiguity and decision-making.
+
+business_value: |
+  Bridges the gap between requirements (spec.yaml) and implementation by providing comprehensive, AI-friendly implementation plans.
+
+  Business Impact:
+  - Reduces cognitive load on implementing AI - less guessing, more executing
+  - Maintains human-AI collaboration without requiring another lengthy conversation
+  - Standardizes implementation approach across the team
+  - Creates version-controlled implementation documentation
+
+acceptance_criteria:
+  - User runs `/plan <path-to-spec.yaml>`
+  - Planner reads spec.yaml, CLAUDE.md, and relevant codebase context
+  - Planner makes autonomous decisions for ~90% of the plan
+  - Planner asks concise questions only when genuinely ambiguous (gaps in spec, missing integrations, significant architectural choices)
+  - When asking, Planner provides recommendation with brief rationale
+  - Planner generates plan.md file in same directory as spec.yaml
+  - Plan uses appropriate template based on ticket type (feature/bug/spike)
+  - Plan contains granular, ordered implementation steps with clear outcomes
+  - Plan includes pre-made technical decisions with rationale
+  - Plan specifies file paths to create/modify/reference
+  - Plan includes detailed data models and API contracts
+  - Plan provides concrete test cases with expected assertions
+  - Plan specifies error handling scenarios
+  - Plan lists dependencies with versions
+  - Plan documents integration points
+  - Plan includes effort estimation with assumptions clearly stated
+  - Planner acts like senior software engineer (confident but collaborative, opinionated but pragmatic)
+
+implementation_scope:
+  frontend: []
+  backend:
+    - .claude/commands/plan.md - Slash command definition (Planner persona prompt)
+    - Planner persona with context-loading logic (reads spec.yaml, CLAUDE.md, codebase patterns)
+    - Decision-making framework (when to decide vs. when to ask)
+    - Question templates (concise, with recommendations)
+  database: []
+  templates:
+    - .cddoc/templates/feature-plan-template.md - Feature implementation plan structure
+    - .cddoc/templates/bug-plan-template.md - Bug fix plan structure
+    - .cddoc/templates/spike-plan-template.md - Spike investigation plan structure
+
+technical_considerations: |
+  Context Loading:
+  - Planner must read and synthesize multiple sources: spec.yaml, CLAUDE.md, existing codebase patterns
+  - Must detect ticket type from spec.yaml to use appropriate template
+  - Should reference existing code patterns to maintain consistency
+
+  Decision-Making Logic:
+  - Decide autonomously when: clear from CLAUDE.md, industry best practice, inferable from codebase, low architectural impact
+  - Ask questions when: genuine ambiguity with significant impact, missing critical integration info, performance/scale trade-offs, security decisions beyond spec
+
+  AI-to-AI Communication:
+  - Plan must be detailed enough for implementing AI to execute without making major decisions
+  - Use concrete examples, specific file paths, code snippets where helpful
+  - Minimize ambiguous language ("should", "could", "might") - use definitive language ("will", "must", "create")
+
+  Template Management:
+  - Templates should be customizable by users (in .cddoc/templates/)
+  - Planner reads template, populates with ticket-specific details
+  - Different templates for feature/bug/spike to match their distinct needs
+
+  Effort Estimation:
+  - Planner analyzes complexity and provides time estimates
+  - Includes breakdown (implementation, testing, documentation, review)
+  - States assumptions clearly so developer can adjust if wrong
+
+  Output Structure:
+  specs/tickets/[ticket-type-name]/
+    ├── spec.yaml (requirements - created by Socrates)
+    └── plan.md (implementation - created by Planner)
+
+  Risks:
+  - Planner might make assumptions developer disagrees with → Mitigated by asking when genuinely ambiguous
+  - Plan might become outdated if spec changes → Plan is version controlled, can be regenerated
+  - Over-detailed plans might feel prescriptive → Balance between guidance and flexibility
+
+ticket:
+  type: feature
+  priority: high
+  estimated_effort: 2-3 days
+  created: 2025-11-01
+  updated: 2025-11-01
