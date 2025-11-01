@@ -1,0 +1,237 @@
+# Bug Fix Plan: [Bug Title]
+
+**Generated:** [auto-generated date]
+**Spec:** `[path to spec.yaml]`
+**Ticket Type:** Bug
+**Severity:** [Critical/High/Medium/Low]
+**Estimated Effort:** [time estimate]
+
+---
+
+## Bug Analysis
+
+### Current Behavior
+[Describe what's happening - the symptom]
+
+**Reproduction Steps:**
+1. [Step 1]
+2. [Step 2]
+3. [Step 3]
+
+**Observed Result:** [What actually happens]
+
+### Expected Behavior
+[Describe what should happen]
+
+**Expected Result:** [What should happen instead]
+
+### Impact Assessment
+- **Severity:** [Critical/High/Medium/Low]
+- **Affected Users:** [Who/how many users affected]
+- **Frequency:** [How often does this occur]
+- **Workaround:** [Is there a workaround? What is it?]
+- **Business Impact:** [Revenue, reputation, functionality impact]
+
+---
+
+## Root Cause Analysis
+
+### Hypothesis
+[Your best guess at the root cause based on symptoms and context]
+
+**Evidence Supporting This Hypothesis:**
+1. [Evidence 1]
+2. [Evidence 2]
+
+### Likely Location
+**Files Involved:**
+- `[path/to/file1.py]:[function/class]` - [Why this is suspect]
+- `[path/to/file2.py]:[function/class]` - [Why this is suspect]
+
+---
+
+## Investigation Approach
+
+### Step 1: [Investigation Activity]
+**Purpose:** [What we're trying to learn]
+**Method:** [How we'll investigate]
+**Expected Findings:** [What we expect to discover]
+
+### Step 2: [Investigation Activity]
+**Purpose:** [What we're trying to learn]
+**Method:** [How we'll investigate]
+**Expected Findings:** [What we expect to discover]
+
+[Continue for all investigation steps...]
+
+---
+
+## Fix Strategy
+
+### Proposed Solution
+[Describe the fix approach - what will be changed and how]
+
+**Why This Approach:**
+- [Reason 1]
+- [Reason 2]
+- [Reason 3]
+
+### Alternatives Considered
+
+**Alternative 1: [Approach]**
+- Pros: [Benefits]
+- Cons: [Drawbacks]
+- Why not chosen: [Reason]
+
+**Alternative 2: [Approach]**
+- Pros: [Benefits]
+- Cons: [Drawbacks]
+- Why not chosen: [Reason]
+
+---
+
+## Implementation Steps
+
+### Step 1: [Action Description]
+**File:** `[path/to/file.py]`
+**Change:** [What to modify]
+
+**Before:**
+```python
+# Current buggy code
+[code snippet]
+```
+
+**After:**
+```python
+# Fixed code
+[code snippet]
+```
+
+**Why This Fixes It:** [Explanation]
+
+---
+
+### Step 2: [Action Description]
+**File:** `[path/to/file.py]`
+**Change:** [What to modify]
+
+[Same structure...]
+
+---
+
+[Continue for all implementation steps...]
+
+---
+
+## Testing Strategy
+
+### Reproduction Test (Verify Bug Exists)
+
+**Test:** `test_reproduce_[bug_name]`
+```python
+def test_reproduce_[bug_name]():
+    """This test should FAIL before the fix, PASS after the fix."""
+    # Arrange
+    [setup that triggers the bug]
+
+    # Act
+    [action that causes the bug]
+
+    # Assert
+    # This assertion fails with the bug, passes with the fix
+    assert [expected correct behavior]
+```
+
+### Fix Validation Tests
+
+**Test 1: `test_[fix_scenario]`**
+```python
+def test_[fix_scenario]():
+    # [Test that verifies the fix works]
+```
+
+**Test 2: `test_[edge_case]`**
+```python
+def test_[edge_case]():
+    # [Test edge cases related to the fix]
+```
+
+### Regression Tests
+
+**Test 1: `test_[related_functionality]`**
+```python
+def test_[related_functionality]():
+    """Ensure the fix doesn't break related functionality."""
+    # [Test existing functionality still works]
+```
+
+---
+
+## Regression Prevention
+
+### New Tests to Add
+- [Test 1 description and purpose]
+- [Test 2 description and purpose]
+
+### Edge Cases to Cover
+- [Edge case 1]
+- [Edge case 2]
+- [Edge case 3]
+
+### Validation Checklist
+- ✅ [Validation 1]
+- ✅ [Validation 2]
+- ✅ [Validation 3]
+
+---
+
+## Rollback Plan
+
+### If Fix Doesn't Work
+[Steps to safely revert the change]
+
+### If Fix Causes New Issues
+[How to detect and respond to new issues]
+
+### Monitoring
+[What to monitor after deployment to ensure fix works]
+
+---
+
+## Effort Estimation
+
+| Activity              | Estimated Time | Assumptions |
+|-----------------------|----------------|-------------|
+| Investigation         | [X hours]      | [Assumption 1] |
+| Fix Implementation    | [X hours]      | [Assumption 2] |
+| Testing               | [X hours]      | [Assumption 3] |
+| Validation            | [X hours]      | [Assumption 4] |
+| **Total**             | **[X hours]**  | **[Y hours/days]** |
+
+**Key Assumptions:**
+1. [Assumption affecting estimate]
+2. [Assumption affecting estimate]
+
+**Risks to Estimate:**
+- [Risk 1]: Could add [X hours]
+- [Risk 2]: Could add [X hours]
+
+---
+
+## Definition of Done
+
+- ✅ Root cause identified and verified
+- ✅ Fix implemented
+- ✅ Reproduction test passes (was failing, now passing)
+- ✅ All fix validation tests pass
+- ✅ All regression tests pass
+- ✅ Code formatted (Black)
+- ✅ Linting passes (Ruff)
+- ✅ Code reviewed and approved
+- ✅ Deployed and monitored
+
+---
+
+*Generated by CDD Framework /plan command - Planner persona*
+*Spec: [path to spec.yaml]*

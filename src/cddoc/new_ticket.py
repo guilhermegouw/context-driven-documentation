@@ -99,7 +99,7 @@ def get_template_path(git_root: Path, ticket_type: str) -> Path:
         TicketCreationError: If template not found
     """
     template_name = f"{ticket_type}-ticket-template.yaml"
-    template_path = git_root / ".cddoc" / "templates" / template_name
+    template_path = git_root / ".cdd" / "templates" / template_name
 
     if not template_path.exists():
         raise TicketCreationError(

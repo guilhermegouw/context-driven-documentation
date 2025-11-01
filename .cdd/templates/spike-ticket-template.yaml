@@ -1,0 +1,40 @@
+# Spike Ticket Template
+# This template shows the structure Socrates uses for research/investigation tickets
+
+title: "[Research topic or investigation focus]"
+
+research_questions:
+  - [Key question 1 we need to answer]
+  - [Key question 2 we need to answer]
+  - [Key question 3 we need to answer]
+  # Focus on what we need to learn
+
+investigation_approach: |
+  [How we will conduct this research]
+
+  Methods:
+  - [Investigation method 1]
+  - [Investigation method 2]
+
+  Deliverables:
+  - [What we'll produce - document, POC, recommendation, etc.]
+
+success_criteria: |
+  [How we'll know this spike is complete]
+
+  This spike is successful when:
+  - [Criterion 1]
+  - [Criterion 2]
+
+timebox: [Time limit - e.g., "2 days", "8 hours"]
+
+context: |
+  [Why we need this research]
+  [What decision this will inform]
+
+ticket:
+  type: spike
+  priority: [high/medium/low]
+  created: [auto-generated]
+  updated: [auto-generated]
+  assigned_to: [Who will do the research]

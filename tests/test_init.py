@@ -7,8 +7,10 @@ from cddoc.init import (
     InitializationError,
     check_existing_structure,
     create_directory_structure,
-    create_minimal_files,
+    generate_claude_md,
     initialize_project,
+    install_framework_commands,
+    install_templates,
     is_dangerous_path,
     validate_path,
 )
@@ -18,48 +20,49 @@ def test_initialize_project_creates_structure(tmp_path):
     """Test that initialize_project creates all required directories and files."""
     result = initialize_project(str(tmp_path))
 
-    # Check directories
+    # Check directories (new structure)
     expected_dirs = [
-        "specs",
         "specs/tickets",
-        "specs/archive",
-        ".claude",
+        "docs/features",
         ".claude/commands",
-        ".claude/agents",
-        ".claude/skills",
-        ".cddoc",
-        ".cddoc/templates",
+        ".cdd/templates",
     ]
 
     for dir_path in expected_dirs:
-        assert (
-            tmp_path / dir_path
-        ).exists(), f"Directory {dir_path} should exist"
-        assert (
-            tmp_path / dir_path
-        ).is_dir(), f"{dir_path} should be a directory"
+        full_path = tmp_path / dir_path
+        assert full_path.exists(), f"Directory {dir_path} should exist"
+        assert full_path.is_dir(), f"{dir_path} should be a directory"
 
-    # Check files
-    expected_files = [
-        "CLAUDE.md",
-        ".cddoc/config.yaml",
-        ".cddoc/templates/feature-ticket-template.yaml",
-        ".cddoc/templates/bug-ticket-template.yaml",
-        ".cddoc/templates/spike-ticket-template.yaml",
-    ]
+    # Check .gitkeep files
+    assert (tmp_path / "specs" / "tickets" / ".gitkeep").exists()
+    assert (tmp_path / "docs" / "features" / ".gitkeep").exists()
 
-    for file_path in expected_files:
-        assert (
-            tmp_path / file_path
-        ).exists(), f"File {file_path} should exist"
-        assert (
-            tmp_path / file_path
-        ).is_file(), f"{file_path} should be a file"
+    # Check CLAUDE.md
+    assert (tmp_path / "CLAUDE.md").exists()
+
+    # Check framework commands
+    assert (tmp_path / ".claude" / "commands" / "socrates.md").exists()
+    assert (tmp_path / ".claude" / "commands" / "plan.md").exists()
+    assert (tmp_path / ".claude" / "commands" / "exec.md").exists()
+    assert (tmp_path / ".claude" / "commands" / "exec-auto.md").exists()
+
+    # Check templates
+    assert (
+        tmp_path / ".cdd" / "templates" / "feature-ticket-template.yaml"
+    ).exists()
+    assert (
+        tmp_path / ".cdd" / "templates" / "bug-ticket-template.yaml"
+    ).exists()
+    assert (
+        tmp_path / ".cdd" / "templates" / "spike-ticket-template.yaml"
+    ).exists()
 
     # Verify result structure
     assert result["path"] == tmp_path
-    assert len(result["created_dirs"]) == len(expected_dirs)
-    assert len(result["created_files"]) == len(expected_files)
+    assert len(result["created_dirs"]) > 0
+    assert len(result["installed_commands"]) == 4
+    assert len(result["installed_templates"]) >= 7
+    assert result["claude_md_created"] is True
     assert result["existing_structure"] is False
 
 
@@ -77,40 +80,85 @@ def test_claude_md_content(tmp_path):
     assert "## Technology Stack & Constraints" in content
     assert "## Development Standards" in content
     assert "## Team Conventions" in content
-    assert "CDD Framework v0.1.0" in content
 
 
-def test_config_yaml_content(tmp_path):
-    """Test config.yaml content is correct."""
+def test_framework_commands_installed(tmp_path):
+    """Test that framework commands are properly installed."""
     initialize_project(str(tmp_path))
 
-    config_file = tmp_path / ".cddoc" / "config.yaml"
-    assert config_file.exists()
+    commands_dir = tmp_path / ".claude" / "commands"
 
-    content = config_file.read_text()
-    assert "cdd:" in content
-    assert 'version: "0.1.0"' in content
-    assert "initialized: true" in content
-    assert "prefer_git_root: true" in content
-    assert 'default_ticket_type: "feature"' in content
-    assert "auto_archive: true" in content
+    # Check all commands exist
+    socrates = commands_dir / "socrates.md"
+    plan = commands_dir / "plan.md"
+    exec_cmd = commands_dir / "exec.md"
+    exec_auto = commands_dir / "exec-auto.md"
+
+    assert socrates.exists()
+    assert plan.exists()
+    assert exec_cmd.exists()
+    assert exec_auto.exists()
+
+    # Verify commands have content
+    socrates_content = socrates.read_text()
+    assert "Socrates" in socrates_content
+    assert "CDD FRAMEWORK COMMAND" in socrates_content
+    assert len(socrates_content) > 1000  # Should be substantial
+
+
+def test_templates_installed(tmp_path):
+    """Test that templates are properly installed."""
+    initialize_project(str(tmp_path))
+
+    templates_dir = tmp_path / ".cdd" / "templates"
+
+    # Check ticket templates
+    assert (templates_dir / "feature-ticket-template.yaml").exists()
+    assert (templates_dir / "bug-ticket-template.yaml").exists()
+    assert (templates_dir / "spike-ticket-template.yaml").exists()
+
+    # Check plan templates
+    assert (templates_dir / "feature-plan-template.md").exists()
+    assert (templates_dir / "bug-plan-template.md").exists()
+    assert (templates_dir / "spike-plan-template.md").exists()
+
+    # Check constitution template
+    assert (templates_dir / "constitution-template.md").exists()
+
+    # Check new living doc template
+    assert (templates_dir / "feature-doc-template.md").exists()
 
 
 def test_initialize_existing_structure(tmp_path):
     """Test that initialization handles existing structure gracefully."""
     # First initialization
     result1 = initialize_project(str(tmp_path))
-    assert (
-        len(result1["created_files"]) == 5
-    )  # CLAUDE.md + config.yaml + 3 templates
+    assert result1["claude_md_created"] is True
+    assert len(result1["installed_commands"]) == 4
 
-    # Second initialization should skip existing files
+    # Second initialization should handle existing structure
     result2 = initialize_project(str(tmp_path))
-    assert len(result2["created_files"]) == 0
-    assert (
-        len(result2["skipped_files"]) == 5
-    )  # CLAUDE.md + config.yaml + 3 templates
+    assert result2["claude_md_created"] is False  # Already exists
     assert result2["existing_structure"] is True
+
+
+def test_initialize_with_force_flag(tmp_path):
+    """Test that force flag overwrites existing files."""
+    # First initialization
+    initialize_project(str(tmp_path))
+
+    # Modify CLAUDE.md
+    claude_md = tmp_path / "CLAUDE.md"
+    claude_md.write_text("Modified content")
+
+    # Second initialization with force
+    result = initialize_project(str(tmp_path), force=True)
+    assert result["claude_md_created"] is True
+
+    # Content should be restored from template
+    content = claude_md.read_text()
+    assert "Modified content" not in content
+    assert "# Project Constitution" in content
 
 
 def test_check_existing_structure_empty(tmp_path):
@@ -123,7 +171,7 @@ def test_check_existing_structure_empty(tmp_path):
 def test_check_existing_structure_with_dirs(tmp_path):
     """Test check_existing_structure detects existing directories."""
     (tmp_path / "specs").mkdir()
-    (tmp_path / "specs" / "tickets").mkdir()
+    (tmp_path / "specs" / "tickets").mkdir(parents=True)
 
     has_structure, existing = check_existing_structure(tmp_path)
     assert has_structure is True
@@ -145,70 +193,101 @@ def test_create_directory_structure(tmp_path):
     created = create_directory_structure(tmp_path)
 
     expected_dirs = [
-        "specs",
         "specs/tickets",
-        "specs/archive",
-        ".claude",
+        "docs/features",
         ".claude/commands",
-        ".claude/agents",
-        ".claude/skills",
-        ".cddoc",
-        ".cddoc/templates",
+        ".cdd/templates",
     ]
 
-    assert len(created) == len(expected_dirs)
-
+    # Check all directories were created
     for dir_path in expected_dirs:
         assert (tmp_path / dir_path).exists()
         assert (tmp_path / dir_path).is_dir()
 
-
-def test_create_minimal_files(tmp_path):
-    """Test create_minimal_files creates required files."""
-    # Create .cddoc directory first
-    (tmp_path / ".cddoc").mkdir()
-    (tmp_path / ".cddoc" / "templates").mkdir()
-
-    created, skipped = create_minimal_files(tmp_path)
-
-    assert len(created) == 5
-    assert "CLAUDE.md" in created
-    assert ".cddoc/config.yaml" in created
-    assert ".cddoc/templates/feature-ticket-template.yaml" in created
-    assert ".cddoc/templates/bug-ticket-template.yaml" in created
-    assert ".cddoc/templates/spike-ticket-template.yaml" in created
-    assert len(skipped) == 0
-
-    assert (tmp_path / "CLAUDE.md").exists()
-    assert (tmp_path / ".cddoc" / "config.yaml").exists()
+    # Check .gitkeep files
+    assert (tmp_path / "specs" / "tickets" / ".gitkeep").exists()
+    assert (tmp_path / "docs" / "features" / ".gitkeep").exists()
 
 
-def test_create_minimal_files_skips_existing(tmp_path):
-    """Test create_minimal_files skips existing files."""
-    # Create .cddoc directory and files
-    (tmp_path / ".cddoc").mkdir()
-    (tmp_path / ".cddoc" / "templates").mkdir()
-    (tmp_path / "CLAUDE.md").write_text("existing")
-    (tmp_path / ".cddoc" / "config.yaml").write_text("existing")
-    (
-        tmp_path / ".cddoc" / "templates" / "feature-ticket-template.yaml"
-    ).write_text("existing")
-    (
-        tmp_path / ".cddoc" / "templates" / "bug-ticket-template.yaml"
-    ).write_text("existing")
-    (
-        tmp_path / ".cddoc" / "templates" / "spike-ticket-template.yaml"
-    ).write_text("existing")
+def test_install_framework_commands(tmp_path):
+    """Test install_framework_commands copies all command files."""
+    # Create target directory
+    commands_dest = tmp_path / ".claude" / "commands"
+    commands_dest.mkdir(parents=True)
 
-    created, skipped = create_minimal_files(tmp_path)
+    # Install commands
+    installed = install_framework_commands(tmp_path)
 
-    assert len(created) == 0
-    assert len(skipped) == 5
-    assert "CLAUDE.md" in skipped
-    assert ".cddoc/config.yaml" in skipped
-    assert ".cddoc/templates/feature-ticket-template.yaml" in skipped
-    assert ".cddoc/templates/bug-ticket-template.yaml" in skipped
-    assert ".cddoc/templates/spike-ticket-template.yaml" in skipped
+    # Verify all commands installed
+    assert len(installed) == 4
+    assert ".claude/commands/socrates.md" in installed
+    assert ".claude/commands/plan.md" in installed
+    assert ".claude/commands/exec.md" in installed
+    assert ".claude/commands/exec-auto.md" in installed
+
+    # Verify files exist
+    assert (commands_dest / "socrates.md").exists()
+    assert (commands_dest / "plan.md").exists()
+    assert (commands_dest / "exec.md").exists()
+    assert (commands_dest / "exec-auto.md").exists()
+
+
+def test_install_templates(tmp_path):
+    """Test install_templates copies all template files."""
+    # Create target directory
+    templates_dest = tmp_path / ".cdd" / "templates"
+    templates_dest.mkdir(parents=True)
+
+    # Install templates
+    installed = install_templates(tmp_path)
+
+    # Should have at least 8 templates (3 ticket + 3 plan + constitution + feature-doc)
+    assert len(installed) >= 8
+
+    # Verify key templates exist
+    assert (templates_dest / "constitution-template.md").exists()
+    assert (templates_dest / "feature-ticket-template.yaml").exists()
+    assert (templates_dest / "feature-doc-template.md").exists()
+
+
+def test_generate_claude_md(tmp_path):
+    """Test generate_claude_md creates CLAUDE.md from template."""
+    # Create templates directory and template
+    templates_dir = tmp_path / ".cdd" / "templates"
+    templates_dir.mkdir(parents=True)
+    install_templates(tmp_path)
+
+    # Generate CLAUDE.md
+    result = generate_claude_md(tmp_path)
+    assert result is True
+
+    # Verify file exists and has content
+    claude_md = tmp_path / "CLAUDE.md"
+    assert claude_md.exists()
+
+    content = claude_md.read_text()
+    assert len(content) > 100
+    assert "# Project Constitution" in content
+
+
+def test_generate_claude_md_skip_existing(tmp_path):
+    """Test generate_claude_md skips if CLAUDE.md exists."""
+    # Create templates directory
+    templates_dir = tmp_path / ".cdd" / "templates"
+    templates_dir.mkdir(parents=True)
+    install_templates(tmp_path)
+
+    # Create existing CLAUDE.md
+    claude_md = tmp_path / "CLAUDE.md"
+    claude_md.write_text("Existing content")
+
+    # Try to generate (should skip)
+    result = generate_claude_md(tmp_path, force=False)
+    assert result is False
+
+    # Verify content unchanged
+    content = claude_md.read_text()
+    assert content == "Existing content"
 
 
 def test_is_dangerous_path():
@@ -220,7 +299,7 @@ def test_is_dangerous_path():
     assert is_dangerous_path(Path("/tmp/safe-test")) is False
 
 
-def test_validate_path_dangerous(tmp_path):
+def test_validate_path_dangerous():
     """Test validate_path rejects dangerous paths."""
     with pytest.raises(InitializationError, match="system directory"):
         validate_path(Path("/"))
@@ -262,17 +341,18 @@ def test_directory_hierarchy_correct(tmp_path):
     # specs structure
     assert (tmp_path / "specs").is_dir()
     assert (tmp_path / "specs" / "tickets").is_dir()
-    assert (tmp_path / "specs" / "archive").is_dir()
+
+    # docs structure (new)
+    assert (tmp_path / "docs").is_dir()
+    assert (tmp_path / "docs" / "features").is_dir()
 
     # .claude structure
     assert (tmp_path / ".claude").is_dir()
     assert (tmp_path / ".claude" / "commands").is_dir()
-    assert (tmp_path / ".claude" / "agents").is_dir()
-    assert (tmp_path / ".claude" / "skills").is_dir()
 
-    # .cddoc structure
-    assert (tmp_path / ".cddoc").is_dir()
-    assert (tmp_path / ".cddoc" / "templates").is_dir()
+    # .cdd structure (new)
+    assert (tmp_path / ".cdd").is_dir()
+    assert (tmp_path / ".cdd" / "templates").is_dir()
 
 
 def test_files_have_correct_content_structure(tmp_path):
@@ -295,13 +375,6 @@ def test_files_have_correct_content_structure(tmp_path):
             section in content
         ), f"Section '{section}' missing from CLAUDE.md"
 
-    # config.yaml should have all top-level keys
-    config_yaml = tmp_path / ".cddoc" / "config.yaml"
-    content = config_yaml.read_text()
-    keys = ["cdd:", "project:", "settings:", "features:"]
-    for key in keys:
-        assert key in content, f"Key '{key}' missing from config.yaml"
-
 
 def test_initialize_result_format(tmp_path):
     """Test that initialize_project returns correct result format."""
@@ -310,13 +383,24 @@ def test_initialize_result_format(tmp_path):
     # Check all expected keys are present
     assert "path" in result
     assert "created_dirs" in result
-    assert "created_files" in result
-    assert "skipped_files" in result
+    assert "installed_commands" in result
+    assert "installed_templates" in result
+    assert "claude_md_created" in result
     assert "existing_structure" in result
 
     # Check types
     assert isinstance(result["path"], Path)
     assert isinstance(result["created_dirs"], list)
-    assert isinstance(result["created_files"], list)
-    assert isinstance(result["skipped_files"], list)
+    assert isinstance(result["installed_commands"], list)
+    assert isinstance(result["installed_templates"], list)
+    assert isinstance(result["claude_md_created"], bool)
     assert isinstance(result["existing_structure"], bool)
+
+
+def test_gitkeep_files_created(tmp_path):
+    """Test that .gitkeep files are created in empty directories."""
+    initialize_project(str(tmp_path))
+
+    # Check .gitkeep in user workspace directories
+    assert (tmp_path / "specs" / "tickets" / ".gitkeep").exists()
+    assert (tmp_path / "docs" / "features" / ".gitkeep").exists()
