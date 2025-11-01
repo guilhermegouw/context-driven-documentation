@@ -1,0 +1,88 @@
+# Feature Ticket: Executor Command
+# AI-driven code implementation from specifications and plans
+
+title: "Executor Command - Automated Code Implementation from Plans"
+
+user_story: |
+  As a developer using the CDD framework,
+  I want to execute implementation automatically from my detailed plan,
+  So that Claude Code can write the code following the plan without me having to manually guide each step.
+
+business_value: |
+  Completes the core CDD workflow: init → new → socrates → plan → exec
+
+  Business Impact:
+  - Enables fully AI-driven implementation from specifications to working code
+  - Reduces manual effort in translating plans into implementation
+  - Provides progress tracking and resumability for long implementations
+  - Creates a complete documentation-to-code pipeline for AI-assisted development
+  - Differentiates CDD as an end-to-end engineering intelligence system
+
+acceptance_criteria:
+  - /exec command reads plan.md file (required)
+  - /exec command reads spec.yaml from same directory (optional with prompt)
+  - /exec command reads CLAUDE.md for project context (optional with prompt)
+  - /exec command creates progress.yaml to track implementation progress
+  - /exec command uses TodoWrite for in-session progress visibility
+  - /exec command auto-fixes formatting issues (Black, Ruff)
+  - /exec command warns on code issues and provides options (interactive mode)
+  - /exec command validates acceptance criteria from spec.yaml at completion
+  - /exec command reports completion status with files created/modified
+  - /exec-auto command runs in fully automatic mode (auto-fixes everything, logs issues)
+  - progress.yaml persists across sessions for resumability
+  - progress.yaml tracks completed steps, pending steps, and acceptance criteria status
+  - progress.yaml includes timestamps and files touched per step
+
+implementation_scope:
+  frontend:
+    - N/A (CLI/slash command only)
+
+  backend:
+    - Create .claude/commands/exec.md - Executor persona instructions
+    - Create .claude/commands/exec-auto.md - Auto mode variant
+    - Create src/cddoc/handlers/progress_handler.py - Read/write progress.yaml
+    - Implement progress.yaml structure with steps tracking
+    - Implement progress.yaml structure with acceptance criteria tracking
+    - Implement file tracking (created/modified files per step)
+
+  database:
+    - N/A (file-based system)
+
+technical_considerations: |
+  **Architecture:**
+  - Slash command pattern (like /socrates and /plan)
+  - No Python CLI command needed (unlike cdd init, cdd new)
+  - Pure Claude Code slash command execution
+
+  **Progress Persistence:**
+  - progress.yaml stored in specs/tickets/<ticket-name>/
+  - Enables resumability across Claude sessions
+  - Tracks granular step completion with timestamps
+
+  **Execution Modes:**
+  - Interactive mode (default): Warns on issues, asks for decisions
+  - Auto mode (--auto): Fully automatic, auto-fixes everything, logs issues
+
+  **Quality Integration:**
+  - Auto-fixes: Black formatting, Ruff linting
+  - Warns on: Test failures, code errors, missing dependencies
+  - Validates: Acceptance criteria from spec.yaml
+
+  **Dependencies:**
+  - Depends on plan.md existence (hard requirement)
+  - spec.yaml optional but recommended
+  - CLAUDE.md optional but recommended
+
+  **Future Enhancements (OUT OF SCOPE):**
+  - /get-back command for resuming incomplete implementations
+  - Helper agents: code reviewer, testing agent, docs agent, architect agent
+  - /plan enhancement to generate structured plans with step IDs
+  - Git commit automation
+  - Multi-phase execution with validation between phases
+
+ticket:
+  type: feature
+  priority: high
+  estimated_effort: 8-12 hours
+  created: 2025-11-01
+  updated: 2025-11-01

@@ -1,0 +1,35 @@
+# Bug Ticket Template
+# This template shows the structure Socrates uses for bug reports
+
+title: "[Clear description of the bug]"
+
+problem_description: |
+  **Current Behavior:**
+  [What is happening that shouldn't be]
+
+  **Expected Behavior:**
+  [What should be happening instead]
+
+reproduction_steps:
+  - [Step 1 to reproduce]
+  - [Step 2 to reproduce]
+  - [Step 3 to reproduce]
+  # Continue until bug is reproduced
+
+impact_assessment:
+  severity: [critical/high/medium/low]
+  affected_users: [Who is impacted - all users, specific role, percentage]
+  workaround: [Available workaround, or "None known"]
+  business_impact: [How this affects business operations]
+
+environment:
+  browser: [If applicable]
+  os: [If applicable]
+  version: [Application version where bug occurs]
+
+ticket:
+  type: bug
+  priority: [critical/high/medium/low]
+  created: [auto-generated]
+  updated: [auto-generated]
+  reported_by: [Who reported this]

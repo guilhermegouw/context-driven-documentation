@@ -27,15 +27,17 @@
 **Core Architectural Patterns:**
 - **Handler Pattern**: Separate handlers for different file types (ConstitutionHandler, TicketSpecHandler, etc.) - each knows how to work with its specific file format
 - **Command Pattern**: CLI commands via Click (`cdd init`, etc.) for tooling operations
-- **Slash Commands**: AI-driven commands (`/socrates`) that turn Claude into specialized personas for intelligent conversations
+- **Slash Commands**: AI-driven commands (`/socrates`, `/plan`) that turn Claude into specialized personas for intelligent conversations
+  - `/socrates` - Interactive requirements gathering through natural conversation
+  - `/plan` - Autonomous implementation planning with minimal questions
 - **Template-Driven**: Use templates to define structure, AI reads templates to understand what needs to be captured
 
 **Key Architectural Decisions:**
 1. **Conventional over Clever**: Use familiar design patterns AI already understands rather than inventing new abstractions
 2. **Modular Structure**: Each component is self-contained and single-purpose for easy AI comprehension
 3. **Two-Tier Interface**:
-   - CLI commands (`cdd init`) for mechanical operations
-   - Slash commands (`/socrates`) for AI-driven intelligent interactions
+   - CLI commands (`cdd init`, `cdd new`) for mechanical operations
+   - Slash commands (`/socrates`, `/plan`) for AI-driven intelligent interactions
 4. **File-Based**: All state lives in files (no database) - simple, inspectable, version-controllable
 
 **Code Organization:**

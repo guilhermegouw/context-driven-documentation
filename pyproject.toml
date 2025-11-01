@@ -9,6 +9,11 @@ homepage = "https://github.com/guilhermegouw/context-driven-documentation"
 repository = "https://github.com/guilhermegouw/context-driven-documentation"
 keywords = ["documentation", "ai", "claude", "dev-tools", "llm"]
 packages = [{include = "cddoc", from = "src"}]
+include = [
+    "src/cddoc/commands/*.md",
+    "src/cddoc/templates/*.md",
+    "src/cddoc/templates/*.yaml"
+]
 
 classifiers = [
     "Development Status :: 3 - Alpha",

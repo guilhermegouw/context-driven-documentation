@@ -78,25 +78,32 @@ def _display_results(result: dict):
         result: Dictionary containing initialization results
     """
     created_dirs = result.get("created_dirs", [])
-    created_files = result.get("created_files", [])
-    skipped_files = result.get("skipped_files", [])
+    installed_commands = result.get("installed_commands", [])
+    installed_templates = result.get("installed_templates", [])
+    claude_md_created = result.get("claude_md_created", False)
 
     # Create summary table
     table = Table(title="Initialization Summary", show_header=True)
-    table.add_column("Item", style="cyan")
-    table.add_column("Status", style="green")
+    table.add_column("Component", style="cyan", width=40)
+    table.add_column("Status", style="green", width=20)
 
     # Add created directories
     for dir_path in created_dirs:
         table.add_row(f"📁 {dir_path}", "✅ Created")
 
-    # Add created files
-    for file_path in created_files:
-        table.add_row(f"📄 {file_path}", "✅ Created")
+    # Add CLAUDE.md
+    if claude_md_created:
+        table.add_row("📄 CLAUDE.md", "✅ Created")
+    else:
+        table.add_row("📄 CLAUDE.md", "⚠️  Already exists")
 
-    # Add skipped files
-    for file_path in skipped_files:
-        table.add_row(f"📄 {file_path}", "⚠️  Skipped (exists)")
+    # Add framework commands
+    for cmd_path in installed_commands:
+        table.add_row(f"🤖 {cmd_path}", "✅ Installed")
+
+    # Add templates
+    for template_path in installed_templates:
+        table.add_row(f"📋 {template_path}", "✅ Installed")
 
     if table.row_count > 0:
         console.print(table)
@@ -112,30 +119,40 @@ def _display_next_steps(project_path):
     Args:
         project_path: Path where project was initialized
     """
-    next_steps = """[bold]Next Steps:[/bold]
+    next_steps = """[bold]Your CDD Framework is Ready![/bold]
 
-1. 📝 Complete your project constitution in [cyan]CLAUDE.md[/cyan]
-   - In Claude Code, run: [cyan]/socrates CLAUDE.md[/cyan]
-   - Have a natural conversation with Socrates AI
-   - Your constitution will be built through dialogue
+📁 Structure Created:
+   • [cyan]CLAUDE.md[/cyan] - Project constitution (edit this first!)
+   • [cyan]specs/tickets/[/cyan] - Temporary sprint work
+   • [cyan]docs/features/[/cyan] - Living documentation
+   • [cyan].claude/commands/[/cyan] - AI agents (socrates, plan, exec)
+   • [cyan].cdd/templates/[/cyan] - Internal templates
 
-2. 🎯 Create your first ticket specification:
-   - In Claude Code, run: [cyan]/socrates specs/tickets/your-feature/spec.yaml[/cyan]
-   - Socrates will guide you through documenting your feature
+🚀 [bold]Quick Start Workflow:[/bold]
 
-3. 🤖 Start development with full context (coming soon):
-   - Use your completed specs to build features
-   - AI will have complete project context from your documentation
+1. [yellow]Edit CLAUDE.md[/yellow] - Fill in your project details
+   Your project's foundation for all AI collaboration
 
-4. 📚 Learn more:
-   - Check [cyan]examples/SOCRATES_GUIDE.md[/cyan] for detailed usage
-   - Visit [link]https://github.com/guilhermegouw/context-driven-documentation[/link]
+2. [yellow]Create a ticket:[/yellow] [green]cdd new feature user-auth[/green]
+   Generates a ticket in specs/tickets/
+
+3. [yellow]Gather requirements:[/yellow] [green]/socrates[/green] (in Claude Code)
+   AI-guided conversation to complete spec.yaml
+
+4. [yellow]Generate plan:[/yellow] [green]/plan feature-user-auth[/green]
+   Creates detailed implementation plan
+
+5. [yellow]Implement:[/yellow] [green]/exec feature-user-auth[/green]
+   AI writes code from the plan!
+
+📚 [bold]Learn More:[/bold]
+   [link]https://github.com/guilhermegouw/context-driven-documentation[/link]
 """
 
     console.print(
         Panel(
             next_steps,
-            title="🎉 CDD Framework Initialized Successfully!",
+            title="✅ CDD Framework Initialized",
             border_style="green",
         )
     )
@@ -223,13 +240,15 @@ def _display_ticket_success(result: dict):
    - Have a natural conversation with Socrates AI
    - Your specification will be built through dialogue
 
-2. 🎯 Review the generated spec:
-   - Open: [cyan]{ticket_path / "spec.yaml"}[/cyan]
-   - Ensure all sections are complete and accurate
+2. 🎯 Generate implementation plan:
+   - In Claude Code, run: [cyan]/plan {ticket_path / "spec.yaml"}[/cyan]
+   - Planner will analyze your spec and create a detailed plan
+   - Review the generated plan: [cyan]{ticket_path / "plan.md"}[/cyan]
 
 3. 🚀 Start implementation:
-   - Use the spec as context for AI-assisted development
-   - Claude will understand your requirements from the spec
+   - Use the plan.md as your implementation guide
+   - Claude will have full context from spec + plan
+   - Build with confidence!
 
 4. 📚 Learn more:
    - Visit [link]https://github.com/guilhermegouw/context-driven-documentation[/link]
