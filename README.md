@@ -57,7 +57,7 @@ cdd init
 This creates:
 - `CLAUDE.md` - Your project's constitution
 - `specs/tickets/` - Where your sprint work lives
-- `docs/features/` - Living documentation that stays synchronized
+- `docs/features/` and `docs/guides/` - Living documentation that stays synchronized
 - Framework AI agents for intelligent collaboration
 
 ### Your First Feature (5-Step Workflow)
@@ -67,7 +67,7 @@ This creates:
 cdd new feature user-authentication
 
 # 2. Open in Claude Code and have a conversation with Socrates
-/socrates
+/socrates feature-user-authentication
 
 # Socrates asks intelligent questions:
 # - "What problem are you solving?"
@@ -92,6 +92,29 @@ cdd new feature user-authentication
 
 **That's it.** Conversational requirements → Autonomous planning → AI implementation.
 
+### Create Documentation (Simpler Workflow)
+
+Documentation has a simpler workflow - no spec/plan/exec phases:
+
+```bash
+# Create a guide or feature doc
+cdd documentation guide getting-started
+cdd documentation feature authentication
+
+# Fill it with Socrates
+/socrates docs/guides/getting-started.md
+
+# Socrates helps you build comprehensive docs through conversation
+# - What is this guide about?
+# - Who is the audience?
+# - What examples would help?
+# Your documentation gets built naturally
+
+# Keep it updated as your code evolves - it's living documentation!
+```
+
+**Key difference:** Documentation is meant to evolve continuously with your codebase. Create it once, refine it often with Socrates.
+
 ---
 
 ## 🏗️ **How It Works**
@@ -109,8 +132,10 @@ my-project/
 │           ├── spec.yaml  # Requirements from conversation
 │           └── plan.md    # AI-generated implementation plan
 └── docs/
-    └── features/          # Living documentation
-        └── authentication.md
+    ├── features/          # Living feature documentation
+    │   └── authentication.md
+    └── guides/            # User guides and how-tos
+        └── getting-started.md
 ```
 
 ### **CLAUDE.md - Your Project's Constitution**
@@ -231,7 +256,7 @@ Everything lives in files you can version control, review, and share. No databas
 
 ```
 1. cdd new feature-name         → Creates ticket structure
-2. /socrates                    → Conversational spec creation
+2. /socrates feature-name       → Conversational spec creation
 3. /plan feature-name           → AI generates implementation plan
 4. /exec feature-name           → AI implements with full context
 5. Documentation updates        → Living docs stay synchronized

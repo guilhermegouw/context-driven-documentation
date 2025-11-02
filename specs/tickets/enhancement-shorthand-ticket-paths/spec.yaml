@@ -1,0 +1,124 @@
+# Enhancement Ticket
+# Shorthand Ticket Paths for Slash Commands
+
+title: "Shorthand Ticket Paths for Slash Commands"
+
+enhancement_type: improvement
+
+current_state: |
+  Slash commands require full file paths, making them verbose and repetitive.
+
+  Current Behavior:
+  - /socrates specs/tickets/feature-user-auth/spec.yaml - long, repetitive
+  - /plan specs/tickets/feature-user-auth/spec.yaml - breaks conversation flow
+  - /exec specs/tickets/feature-user-auth/plan.md - tedious to type
+
+  Current Limitations:
+  - Verbose typing slows down workflow
+  - Breaks the "natural conversation" principle of AI-first design
+  - Users must remember exact directory structure
+  - Friction in the interaction loop
+
+desired_state: |
+  Accept ticket names as shorthand with smart path resolution.
+
+  Improved Behavior:
+  - /socrates feature-user-auth → resolves to specs/tickets/feature-user-auth/spec.yaml
+  - /plan feature-user-auth → resolves to specs/tickets/feature-user-auth/spec.yaml
+  - /exec feature-user-auth → resolves to specs/tickets/feature-user-auth/plan.md
+  - Full paths still work: /socrates specs/tickets/feature-user-auth/spec.yaml (backward compatible)
+  - Non-ticket paths work: /socrates CLAUDE.md, /socrates docs/features/auth.md
+
+  Benefits Gained:
+  - Faster, more natural workflow
+  - Less cognitive load - just remember ticket name
+  - Aligns with AI-first philosophy (conversation > commands)
+  - Helpful error messages guide users to correct ticket names
+
+motivation: |
+  Why we need this enhancement
+
+  Problem: Verbose path syntax creates friction in AI-assisted workflow
+  Impact: Slows down developers, breaks conversational flow, makes the tool feel less "AI-first"
+  Value: Faster iterations, more natural interaction, better developer experience
+
+acceptance_criteria:
+  - /socrates <ticket-name> resolves to specs/tickets/<ticket-name>/spec.yaml
+  - /plan <ticket-name> resolves to specs/tickets/<ticket-name>/spec.yaml
+  - /exec <ticket-name> resolves to specs/tickets/<ticket-name>/plan.md
+  - Full paths still work (backward compatible) - /socrates specs/tickets/feature-x/spec.yaml
+  - Non-ticket paths work - /socrates CLAUDE.md, /socrates docs/features/auth.md
+  - Error shows top 3 fuzzy matches (70-75% similarity threshold) when ticket not found
+  - Error shows friendly "create it" suggestion when no matches found
+  - All existing slash command functionality remains unchanged
+
+implementation_scope:
+  code_changes:
+    - src/cddoc/path_resolver.py - Create PathResolver utility class
+    - .claude/commands/socrates.md - Use PathResolver for argument parsing
+    - .claude/commands/plan.md - Use PathResolver for argument parsing
+    - .claude/commands/exec.md - Use PathResolver with plan.md target
+  tests:
+    - tests/test_path_resolver.py - Unit tests for resolution logic (shorthand, full path, fuzzy matching, errors)
+    - Manual testing checklist for slash commands (per CLAUDE.md standards)
+  documentation:
+    - docs/guides/CLI_REFERENCE.md - Document shorthand syntax
+    - README.md - Update examples to show shorthand
+    - src/cddoc/cli.py - Update Next Steps message with shorthand examples
+
+impact_assessment:
+  breaking_changes: no
+  backward_compatibility: yes
+  migration_required: no
+  affected_components:
+    - /socrates slash command
+    - /plan slash command
+    - /exec slash command
+
+success_metrics:
+  - Users can successfully use shorthand syntax for all slash commands
+  - Error messages provide helpful suggestions (fuzzy matching works)
+  - No regression in existing functionality
+  - Developer experience improvement - faster workflow with less typing
+
+technical_considerations: |
+  Resolution Logic:
+
+  if '/' in argument or argument.endswith(('.md', '.yaml')):
+      # Explicit path - use as-is
+      return argument
+  else:
+      # Ticket shorthand - resolve to specs/tickets/{name}/{target_file}
+      return f"specs/tickets/{argument}/{target_file}"
+
+  Fuzzy Matching:
+  - Use Python's difflib.get_close_matches() or similar
+  - Similarity threshold: 70-75%
+  - Return top 3 matches
+
+  Error Handling (follows three-part pattern):
+  ❌ Ticket not found: my-feature
+
+  Did you mean:
+  • feature-my-feature → /socrates feature-my-feature
+  • enhancement-my-feature-set → /socrates enhancement-my-feature-set
+
+  Or create it: cdd new feature my-feature
+
+  Risks:
+  - Ambiguous ticket names - MITIGATION: Exact match takes precedence
+  - Performance with many tickets - MITIGATION: Directory scan is fast, fuzzy matching only on error
+
+  Dependencies:
+  - Python standard library difflib for fuzzy matching (no new dependencies)
+
+  Alternatives Considered:
+  - Two-argument syntax /socrates feature user-auth - REJECTED: Ticket names already contain type prefix
+  - Strict shorthand only (no full paths) - REJECTED: Reduces flexibility for edge cases
+
+ticket:
+  type: enhancement
+  priority: medium
+  estimated_effort: 4-6 hours
+  created: 2025-11-02
+  updated: 2025-11-02

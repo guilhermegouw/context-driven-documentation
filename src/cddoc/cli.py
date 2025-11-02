@@ -146,13 +146,13 @@ Walk in with an idea. Walk out with a complete spec.
 2. [yellow]Create a ticket:[/yellow] [green]cdd new feature user-auth[/green]
    Generates a ticket in specs/tickets/
 
-3. [yellow]Gather requirements:[/yellow] [green]/socrates specs/tickets/feature-user-auth/spec.yaml[/green]
+3. [yellow]Gather requirements:[/yellow] [green]/socrates feature-user-auth[/green]
    Brainstorm with Socrates - uncover edge cases, clarify scope, build complete specs
 
-4. [yellow]Generate plan:[/yellow] [green]/plan specs/tickets/feature-user-auth/spec.yaml[/green]
+4. [yellow]Generate plan:[/yellow] [green]/plan feature-user-auth[/green]
    Clear spec → Detailed plan → Confident implementation
 
-5. [yellow]Implement:[/yellow] [green]/exec specs/tickets/feature-user-auth/plan.md[/green]
+5. [yellow]Implement:[/yellow] [green]/exec feature-user-auth[/green]
    Clear spec + Detailed plan = AI builds exactly what you need (not what it guesses)
 
 📚 [bold]Learn More:[/bold]
@@ -272,6 +272,120 @@ def _display_ticket_success(result: dict):
         Panel(
             next_steps,
             title="🎉 Ticket Created Successfully!",
+            border_style="green",
+        )
+    )
+
+
+@main.command()
+@click.argument(
+    "doc_type",
+    type=click.Choice(["guide", "feature"], case_sensitive=False),
+)
+@click.argument("name")
+def documentation(doc_type, name):
+    """Create a new documentation file.
+
+    DOC_TYPE: Type of documentation (guide or feature)
+    NAME: Name for the documentation file (will be auto-normalized)
+
+    Examples:
+        cdd documentation guide getting-started
+        cdd documentation feature "User Authentication"
+
+    The command will:
+    - Normalize the name to lowercase-with-dashes format
+    - Create docs/guides/<name>.md or docs/features/<name>.md
+    - Populate template with structured sections
+    - Show you the next steps (use Socrates to fill it!)
+    """
+    console.print(
+        Panel.fit(
+            f"📚 [bold]Creating {doc_type.title()} Documentation[/bold]",
+            border_style="blue",
+        )
+    )
+
+    try:
+        # Import at function level to avoid circular imports
+        from .new_ticket import (
+            TicketCreationError,
+            create_new_documentation,
+        )
+
+        # Create the documentation
+        result = create_new_documentation(doc_type.lower(), name)
+
+        # Display success
+        console.print()
+        _display_documentation_success(result)
+
+        sys.exit(0)
+
+    except TicketCreationError as e:
+        console.print(f"\n[red]❌ Error:[/red] {e}")
+        sys.exit(1)
+    except Exception as e:
+        console.print(f"\n[red]❌ Unexpected error:[/red] {e}")
+        sys.exit(1)
+
+
+def _display_documentation_success(result: dict):
+    """Display documentation creation success message.
+
+    Args:
+        result: Dictionary containing creation results
+    """
+    file_path = result["file_path"]
+    normalized_name = result["normalized_name"]
+    doc_type = result["doc_type"]
+    overwritten = result["overwritten"]
+
+    # Create status message
+    status = "Overwritten" if overwritten else "Created"
+
+    # Show creation summary
+    table = Table(title=f"{status} Successfully", show_header=True)
+    table.add_column("Field", style="cyan")
+    table.add_column("Value", style="green")
+
+    table.add_row("Type", f"{doc_type.title()} Documentation")
+    table.add_row("File Name", f"{normalized_name}.md")
+    table.add_row("Location", str(file_path))
+
+    console.print(table)
+
+    # Show next steps
+    next_steps = f"""[bold]Next Steps:[/bold]
+
+1. 📝 Fill out your documentation with Socrates:
+   - In Claude Code, run: [cyan]/socrates {file_path}[/cyan]
+   - Have a natural conversation to build comprehensive docs
+   - Socrates will help you think through the structure
+
+2. 📚 Documentation is now part of your living docs:
+   - Guide docs: Help users understand and use features
+   - Feature docs: Technical reference for implementation details
+   - Keep it updated as the code evolves
+
+3. 🔗 Link related documentation:
+   - Cross-reference other guides and features
+   - Build a knowledge network
+
+4. 🎯 Remember the CDD philosophy:
+   - Context captured once, understood forever
+   - Living documentation that evolves with your code
+   - AI assistants have full context automatically
+
+[bold]Pro tip:[/bold] Use Socrates to brainstorm! Start the conversation even if you're not
+sure what to write - Socrates will ask the right questions.
+"""
+
+    console.print()
+    console.print(
+        Panel(
+            next_steps,
+            title="🎉 Documentation File Created!",
             border_style="green",
         )
     )

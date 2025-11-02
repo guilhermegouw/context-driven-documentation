@@ -158,6 +158,7 @@ def create_directory_structure(base_path: Path) -> List[str]:
     directories = [
         "specs/tickets",
         "docs/features",
+        "docs/guides",
         ".claude/commands",
         ".cdd/templates",
     ]
@@ -170,7 +171,7 @@ def create_directory_structure(base_path: Path) -> List[str]:
             created.append(dir_path)
 
             # Create .gitkeep for empty directories
-            if dir_path in ["specs/tickets", "docs/features"]:
+            if dir_path in ["specs/tickets", "docs/features", "docs/guides"]:
                 gitkeep = full_path / ".gitkeep"
                 gitkeep.touch()
 

@@ -216,9 +216,124 @@ success_criteria:
 
 ---
 
+### `cdd documentation`
+
+Create documentation files (guides and features) with structured markdown templates.
+
+**Usage:**
+```bash
+cdd documentation <TYPE> <NAME>
+```
+
+**Arguments:**
+- `TYPE` - Documentation type: `guide` or `feature`
+- `NAME` - Documentation name (will be auto-normalized to lowercase-with-dashes)
+
+**Examples:**
+
+```bash
+# Create a user guide
+cdd documentation guide getting-started
+
+# Create a feature documentation
+cdd documentation feature "User Authentication"
+
+# Create an API guide
+cdd documentation guide api-reference
+```
+
+**What It Creates:**
+
+```
+docs/
+├── guides/
+│   └── <name>.md          # For guides
+└── features/
+    └── <name>.md          # For feature docs
+```
+
+**Key Differences from Tickets:**
+- **Simpler workflow:** No spec.yaml or plan.md - just the markdown file
+- **Clean names:** Files created as `<name>.md` (no type prefix)
+- **Living documentation:** Meant to evolve with your codebase
+- **Conversational creation:** Use `/socrates <file-path>` to fill with AI assistance
+
+**Guide Template Includes:**
+- What is [Topic]?
+- Getting Started
+- Examples
+- Tips & Best Practices
+- Business Rules
+- Common Pitfalls
+- Related Documentation
+
+**Feature Template Includes:**
+- Overview
+- Current Implementation
+- Usage
+- API Reference
+- Business Rules & Edge Cases
+- Testing
+- Dependencies
+- Performance & Scalability
+- Security & Compliance
+- Future Enhancements
+
+**Next Steps After Creating Documentation:**
+1. Open Claude Code in your project
+2. Run `/socrates docs/guides/<name>.md` (or `/socrates docs/features/<name>.md`)
+3. Have a conversation to build comprehensive documentation
+4. Keep it updated as the code evolves
+
+**Error Handling:**
+- If file exists → prompts to overwrite or choose different name
+- If templates missing → suggests running `cdd init`
+- If not in git repository → shows error
+
+---
+
 ## Claude Code Commands
 
 These commands are used inside Claude Code after initialization.
+
+### Shorthand Syntax
+
+Slash commands support shorthand ticket names for faster workflow:
+
+**Shorthand (Recommended):**
+```
+/socrates feature-user-auth
+/plan enhancement-shortcuts
+/exec bug-validation-error
+```
+
+**Full Paths (Still Supported):**
+```
+/socrates specs/tickets/feature-user-auth/spec.yaml
+/plan CLAUDE.md
+/exec docs/features/authentication.md
+```
+
+**How Resolution Works:**
+- If argument contains `/` or ends with `.md`/`.yaml` → Used as explicit path
+- Otherwise → Resolved to `specs/tickets/{ticket-name}/{target-file}`
+- `/socrates` and `/plan` → target `spec.yaml`
+- `/exec` → targets `plan.md`
+
+**Error Handling:**
+
+When a ticket isn't found, you'll see helpful suggestions:
+```
+❌ Ticket not found: my-feature
+
+Did you mean:
+• feature-my-feature → /socrates feature-my-feature
+• enhancement-my-features → /socrates enhancement-my-features
+
+Or create it: cdd new feature my-feature
+```
+
+---
 
 ### `/socrates`
 

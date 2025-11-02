@@ -1,0 +1,86 @@
+# Feature: Add Documentation Support to `cdd new` Command
+# Created through Socrates conversation on 2025-11-02
+
+title: "Add Documentation Support to `cdd new` Command"
+
+user_story: |
+  As a CDD framework user,
+  I want to create documentation files (guides and features) using the same CLI workflow as tickets,
+  So that I can use Socrates to build comprehensive documentation through conversation.
+
+business_value: |
+  Currently, users must manually create documentation files and structure them correctly.
+  This feature extends the familiar workflow and removes friction from documentation.
+
+  Business Impact:
+  - Extends the familiar `cdd new` workflow to documentation
+  - Ensures consistent documentation structure through templates
+  - Enables Socrates-powered documentation creation (conversational docs!)
+  - Removes friction from the documentation process
+  - Supports the "living documentation" vision of CDD
+
+acceptance_criteria:
+  - "`cdd new documentation guide <name>` creates guide in `docs/guides/<name>.md`"
+  - "`cdd new documentation feature <name>` creates feature doc in `docs/features/<name>.md`"
+  - "File names have NO type prefix (e.g., `authentication.md`, not `feature-authentication.md`)"
+  - "Guide template includes: What is [Topic]?, Getting Started, Examples, Tips & Best Practices, Business Rules"
+  - "Feature template includes: Overview, Current Implementation, Usage, API Reference, Business Rules & Edge Cases"
+  - "Socrates can load and fill markdown templates through conversation"
+  - "Error handling: Template not found, file already exists, invalid names"
+  - "Help text updated to show documentation subcommand"
+
+implementation_scope:
+  cli:
+    - "Add `documentation` subcommand to `cdd new` in src/cddoc/cli.py"
+    - "Accept `guide` or `feature` as documentation type"
+    - "Show appropriate success message with next steps"
+  backend:
+    - "Add logic to handle `documentation` type in src/cddoc/new_ticket.py"
+    - "Route to `docs/guides/` or `docs/features/` based on subtype"
+    - "Create files with clean names (no type prefix)"
+    - "Load markdown templates (not YAML templates)"
+    - "Handle documentation-specific errors"
+  templates:
+    - "Create `.cdd/templates/guide-doc-template.md` with sections: What is [Topic]?, Getting Started, Examples, Tips & Best Practices, Business Rules"
+    - "Create `.cdd/templates/feature-doc-template.md` with sections: Overview, Current Implementation, Usage, API Reference, Business Rules & Edge Cases"
+  verification:
+    - "Verify Socrates can read markdown templates"
+    - "Verify Socrates can guide documentation completion"
+    - "Test conversational flow feels natural"
+
+technical_considerations: |
+  Key Technical Aspects:
+
+  - Backward Compatibility: Must maintain compatibility with existing `cdd new feature/bug/spike/enhancement`
+  - Simpler Workflow: Documentation workflow is simpler than tickets (new → template → Socrates, no spec/plan/exec phases)
+  - File Naming: Must create clean names without type prefixes
+  - Template Format: Markdown templates (not YAML) must work well with Socratic conversation
+  - Error Handling: Must follow existing three-part error format (what/why/how)
+
+  Dependencies:
+  - Required: Existing `cdd new` command infrastructure, existing template system, Socrates slash command
+  - Optional: None
+
+  Constraints:
+  - Templates must be conversationally friendly
+  - File structure must match existing docs/ organization
+  - No changes to ticket workflow (feature/bug/spike)
+
+out_of_scope:
+  - "Business Analyst agent (separate future feature)"
+  - "Central `business-rules.md` file (future enhancement)"
+  - "Additional documentation types beyond guide/feature"
+  - "Automatic documentation generation from code"
+
+success_metrics:
+  - "Users can create documentation files via CLI"
+  - "Socrates can successfully guide documentation completion"
+  - "Documentation structure is consistent across guides and features"
+  - "Workflow feels natural and intuitive"
+
+ticket:
+  type: feature
+  priority: medium
+  estimated_effort: "4-6 hours"
+  created: 2025-11-02
+  updated: 2025-11-02

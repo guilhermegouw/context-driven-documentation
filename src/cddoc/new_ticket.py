@@ -222,6 +222,77 @@ def create_ticket_file(ticket_path: Path, template_path: Path) -> None:
         raise TicketCreationError(f"Failed to create ticket: {e}")
 
 
+def get_documentation_directory(git_root: Path, doc_type: str) -> Path:
+    """Get destination directory for documentation files.
+
+    Args:
+        git_root: Git repository root path
+        doc_type: Type of documentation ("guide" or "feature")
+
+    Returns:
+        Path to documentation directory
+    """
+    if doc_type == "guide":
+        return git_root / "docs" / "guides"
+    elif doc_type == "feature":
+        return git_root / "docs" / "features"
+    else:
+        raise ValueError(f"Invalid documentation type: {doc_type}")
+
+
+def get_documentation_template_path(git_root: Path, doc_type: str) -> Path:
+    """Get path to documentation template file.
+
+    Args:
+        git_root: Git repository root path
+        doc_type: Type of documentation ("guide" or "feature")
+
+    Returns:
+        Path to template file
+
+    Raises:
+        TicketCreationError: If template not found
+    """
+    template_name = f"{doc_type}-doc-template.md"
+    template_path = git_root / ".cdd" / "templates" / template_name
+
+    if not template_path.exists():
+        raise TicketCreationError(
+            f"Template not found: {template_name}\n"
+            f"Documentation templates are required.\n"
+            f"Run: cdd init"
+        )
+
+    return template_path
+
+
+def create_documentation_file(file_path: Path, template_path: Path) -> None:
+    """Create documentation markdown file from template.
+
+    Args:
+        file_path: Full path where documentation should be created
+        template_path: Path to template file
+
+    Raises:
+        TicketCreationError: If creation fails
+    """
+    try:
+        # Ensure parent directory exists
+        file_path.parent.mkdir(parents=True, exist_ok=True)
+
+        # Read template
+        template_content = template_path.read_text()
+
+        # Note: We don't populate dates for documentation (unlike tickets)
+        # Documentation is living and continuously updated
+
+        # Write markdown file
+        file_path.write_text(template_content)
+
+    except Exception as e:
+        raise TicketCreationError(f"Failed to create documentation: {e}")
+
+
 def create_new_ticket(ticket_type: str, name: str) -> dict:
     """Create a new ticket specification file.
 
@@ -301,5 +372,92 @@ def create_new_ticket(ticket_type: str, name: str) -> dict:
         "ticket_path": ticket_path,
         "normalized_name": normalized_name,
         "ticket_type": ticket_type,
+        "overwritten": overwritten,
+    }
+
+
+def create_new_documentation(doc_type: str, name: str) -> dict:
+    """Create a new documentation file.
+
+    Main entry point for documentation creation logic.
+    Similar to create_new_ticket() but simpler (no spec.yaml/plan.md).
+
+    Args:
+        doc_type: Type of documentation ("guide" or "feature")
+        name: Documentation name (will be normalized)
+
+    Returns:
+        Dictionary with creation results:
+        {
+            "file_path": Path,           # Full path to created .md file
+            "normalized_name": str,       # Normalized file name
+            "doc_type": str,              # "guide" or "feature"
+            "overwritten": bool           # Whether file was overwritten
+        }
+
+    Raises:
+        TicketCreationError: If creation fails
+    """
+    # Normalize the name
+    normalized_name = normalize_ticket_name(name)
+
+    if not normalized_name:
+        raise TicketCreationError(
+            "Invalid documentation name\n"
+            "Name must contain at least one alphanumeric character.\n"
+            "Example: cdd new documentation guide getting-started"
+        )
+
+    # Get git root
+    git_root = get_git_root()
+
+    # Get template
+    template_path = get_documentation_template_path(git_root, doc_type)
+
+    # Get destination directory
+    doc_directory = get_documentation_directory(git_root, doc_type)
+
+    # Construct file path (clean name, no type prefix)
+    file_path = doc_directory / f"{normalized_name}.md"
+
+    overwritten = False
+
+    # Handle existing file with loop (same pattern as tickets)
+    while file_path.exists():
+        console.print(
+            f"\n[yellow]⚠️  Documentation already exists: {file_path}[/yellow]"
+        )
+
+        if prompt_overwrite():
+            overwritten = True
+            break
+        else:
+            # Prompt for new name
+            new_name = prompt_new_name(f"{doc_type} documentation")
+
+            if new_name is None:
+                raise TicketCreationError(
+                    "Documentation creation cancelled by user"
+                )
+
+            # Re-normalize and reconstruct path
+            normalized_name = normalize_ticket_name(new_name)
+
+            if not normalized_name:
+                console.print(
+                    "[red]❌ Invalid name - must contain alphanumeric "
+                    "characters[/red]"
+                )
+                continue
+
+            file_path = doc_directory / f"{normalized_name}.md"
+
+    # Create the documentation file
+    create_documentation_file(file_path, template_path)
+
+    return {
+        "file_path": file_path,
+        "normalized_name": normalized_name,
+        "doc_type": doc_type,
         "overwritten": overwritten,
     }
