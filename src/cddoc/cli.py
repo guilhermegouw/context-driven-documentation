@@ -168,49 +168,116 @@ Walk in with an idea. Walk out with a complete spec.
     )
 
 
-@main.command()
-@click.argument(
-    "ticket_type",
-    type=click.Choice(
-        ["feature", "bug", "spike", "enhancement"], case_sensitive=False
-    ),
-)
-@click.argument("name")
-def new(ticket_type, name):
-    """Create a new ticket specification file.
+@main.group(invoke_without_command=False)
+def new():
+    """Create new tickets or documentation."""
+    pass
 
-    TICKET_TYPE: Type of ticket (feature, bug, spike, or enhancement)
-    NAME: Name for the ticket (will be auto-normalized)
+
+@new.command()
+@click.argument("name")
+def feature(name):
+    """Create a new feature ticket.
 
     Examples:
         cdd new feature user-authentication
-        cdd new bug "Payment Processing Error"
-        cdd new spike api_performance_investigation
-        cdd new enhancement improve-error-messages
-
-    The command will:
-    - Normalize the name to lowercase-with-dashes format
-    - Create specs/tickets/<type>-<name>/spec.yaml
-    - Populate template with current date
-    - Show you the next steps
     """
     console.print(
         Panel.fit(
-            f"🎫 [bold]Creating {ticket_type.title()} Ticket[/bold]",
+            "🎫 [bold]Creating Feature Ticket[/bold]",
             border_style="blue",
         )
     )
 
     try:
-        # Create the ticket
-        result = create_new_ticket(ticket_type.lower(), name)
-
-        # Display success
+        result = create_new_ticket("feature", name)
         console.print()
         _display_ticket_success(result)
-
         sys.exit(0)
+    except TicketCreationError as e:
+        console.print(f"\n[red]❌ Error:[/red] {e}")
+        sys.exit(1)
+    except Exception as e:
+        console.print(f"\n[red]❌ Unexpected error:[/red] {e}")
+        sys.exit(1)
 
+
+@new.command()
+@click.argument("name")
+def bug(name):
+    """Create a new bug ticket.
+
+    Examples:
+        cdd new bug "Payment Processing Error"
+    """
+    console.print(
+        Panel.fit(
+            "🎫 [bold]Creating Bug Ticket[/bold]",
+            border_style="blue",
+        )
+    )
+
+    try:
+        result = create_new_ticket("bug", name)
+        console.print()
+        _display_ticket_success(result)
+        sys.exit(0)
+    except TicketCreationError as e:
+        console.print(f"\n[red]❌ Error:[/red] {e}")
+        sys.exit(1)
+    except Exception as e:
+        console.print(f"\n[red]❌ Unexpected error:[/red] {e}")
+        sys.exit(1)
+
+
+@new.command()
+@click.argument("name")
+def spike(name):
+    """Create a new spike (research) ticket.
+
+    Examples:
+        cdd new spike api_performance_investigation
+    """
+    console.print(
+        Panel.fit(
+            "🎫 [bold]Creating Spike Ticket[/bold]",
+            border_style="blue",
+        )
+    )
+
+    try:
+        result = create_new_ticket("spike", name)
+        console.print()
+        _display_ticket_success(result)
+        sys.exit(0)
+    except TicketCreationError as e:
+        console.print(f"\n[red]❌ Error:[/red] {e}")
+        sys.exit(1)
+    except Exception as e:
+        console.print(f"\n[red]❌ Unexpected error:[/red] {e}")
+        sys.exit(1)
+
+
+@new.command()
+@click.argument("name")
+def enhancement(name):
+    """Create a new enhancement ticket.
+
+    Examples:
+        cdd new enhancement improve-error-messages
+    """
+    console.print(
+        Panel.fit(
+            "🎫 [bold]Creating Enhancement Ticket[/bold]",
+            border_style="blue",
+        )
+    )
+
+    try:
+        result = create_new_ticket("enhancement", name)
+        console.print()
+        _display_ticket_success(result)
+        sys.exit(0)
     except TicketCreationError as e:
         console.print(f"\n[red]❌ Error:[/red] {e}")
         sys.exit(1)
@@ -277,51 +344,70 @@ def _display_ticket_success(result: dict):
     )
 
 
-@main.command()
-@click.argument(
-    "doc_type",
-    type=click.Choice(["guide", "feature"], case_sensitive=False),
-)
-@click.argument("name")
-def documentation(doc_type, name):
-    """Create a new documentation file.
+@new.group()
+def documentation():
+    """Create documentation files (guides or features)."""
+    pass
 
-    DOC_TYPE: Type of documentation (guide or feature)
-    NAME: Name for the documentation file (will be auto-normalized)
+
+@documentation.command(name="guide")
+@click.argument("name")
+def doc_guide(name):
+    """Create a new guide documentation file.
 
     Examples:
-        cdd documentation guide getting-started
-        cdd documentation feature "User Authentication"
-
-    The command will:
-    - Normalize the name to lowercase-with-dashes format
-    - Create docs/guides/<name>.md or docs/features/<name>.md
-    - Populate template with structured sections
-    - Show you the next steps (use Socrates to fill it!)
+        cdd new documentation guide getting-started
     """
     console.print(
         Panel.fit(
-            f"📚 [bold]Creating {doc_type.title()} Documentation[/bold]",
+            "📚 [bold]Creating Guide Documentation[/bold]",
             border_style="blue",
         )
     )
 
     try:
-        # Import at function level to avoid circular imports
         from .new_ticket import (
             TicketCreationError,
             create_new_documentation,
         )
 
-        # Create the documentation
-        result = create_new_documentation(doc_type.lower(), name)
-
-        # Display success
+        result = create_new_documentation("guide", name)
         console.print()
         _display_documentation_success(result)
-
         sys.exit(0)
+    except TicketCreationError as e:
+        console.print(f"\n[red]❌ Error:[/red] {e}")
+        sys.exit(1)
+    except Exception as e:
+        console.print(f"\n[red]❌ Unexpected error:[/red] {e}")
+        sys.exit(1)
 
+
+@documentation.command(name="feature")
+@click.argument("name")
+def doc_feature(name):
+    """Create a new feature documentation file.
+
+    Examples:
+        cdd new documentation feature authentication
+    """
+    console.print(
+        Panel.fit(
+            "📚 [bold]Creating Feature Documentation[/bold]",
+            border_style="blue",
+        )
+    )
+
+    try:
+        from .new_ticket import (
+            TicketCreationError,
+            create_new_documentation,
+        )
+
+        result = create_new_documentation("feature", name)
+        console.print()
+        _display_documentation_success(result)
+        sys.exit(0)
     except TicketCreationError as e:
         console.print(f"\n[red]❌ Error:[/red] {e}")
         sys.exit(1)

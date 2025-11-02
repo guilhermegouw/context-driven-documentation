@@ -1,155 +1,139 @@
-# Feature: {Feature Name}
+# Feature: [Feature Name]
 
-> Living documentation for {feature-name} - maintained as the feature evolves
+> Living documentation for the [feature name]
 
-**Status:** [Production | Development | Deprecated]
-**Version:** {version}
-**Last Updated:** {date}
-
----
-
-## Current Implementation Status
-
-Brief overview of the feature's current state:
-- Production status and deployment
-- Major milestones and version history
-- Current capabilities and limitations
+**Status:** [Draft | In Development | Production]
+**Version:** [Version number]
+**Last Updated:** [Date]
 
 ---
 
-## How It Works Today
+## Overview
 
-### User Perspective
-- What can users do with this feature?
-- What are the main user flows?
-- What value does it provide?
+[High-level description of what this feature does and why it exists]
 
-### System Behavior
-- How does the system respond to user actions?
-- What are the key workflows and processes?
-- What constraints and limitations exist?
+**Key Capabilities:**
+- [Capability 1]
+- [Capability 2]
+- [Capability 3]
 
----
+## Current Implementation
 
-## Technical Implementation
+### How It Works Today
+
+[Describe the current behavior from user and system perspective]
 
 ### Architecture Overview
-- High-level architecture and components
-- Integration points with other systems
-- Data flow and processing
 
-### API Endpoints
+[Technical architecture - components, data flow, integration points]
+
 ```
-GET /api/{resource}
-POST /api/{resource}
-PUT /api/{resource}/{id}
-DELETE /api/{resource}/{id}
+[Optional ASCII diagram of architecture]
 ```
 
-Brief description of each endpoint and its purpose.
+### Key Components
 
-### Data Models
-```python
-# Example data model structure
-class FeatureModel:
-    field1: str
-    field2: int
-    field3: Optional[datetime]
+**[Component 1]:**
+- Location: `[file path]`
+- Purpose: [What it does]
+- Key functions: [List]
+
+**[Component 2]:**
+- Location: `[file path]`
+- Purpose: [What it does]
+- Key functions: [List]
+
+## Usage
+
+### Basic Usage
+
+[How to use this feature - commands, API calls, etc.]
+
+```[language]
+[Code example]
 ```
 
-Key data models and their relationships.
+### Advanced Usage
 
-### Key Files and Components
-- `path/to/file.py:123` - Component description
-- `path/to/another.py:456` - Another component
-- `path/to/config.yaml` - Configuration
+[More complex scenarios]
 
----
+```[language]
+[Code example]
+```
+
+## API Reference
+
+### [Function/Endpoint 1]
+
+**Signature:** `[function signature or HTTP endpoint]`
+
+**Parameters:**
+- `[param1]` ([type]): [Description]
+- `[param2]` ([type]): [Description]
+
+**Returns:** [Return type and description]
+
+**Example:**
+```[language]
+[Usage example]
+```
+
+### [Function/Endpoint 2]
+
+[Same structure...]
 
 ## Business Rules & Edge Cases
 
 ### Business Logic
-- Core business rules and validations
-- Calculation methods and formulas
-- State transitions and workflows
+- **[Rule 1]:** [Description and behavior]
+- **[Rule 2]:** [Description and behavior]
 
 ### Edge Cases
-- Known edge cases and how they're handled
-- Boundary conditions and limits
-- Error scenarios and recovery
+- **[Edge case 1]:** [How the system handles it]
+- **[Edge case 2]:** [How the system handles it]
 
 ### Validation Rules
-- Input validation requirements
-- Data integrity constraints
-- Security and authorization rules
-
----
+- [Validation 1]
+- [Validation 2]
 
 ## Testing
 
 ### Test Coverage
-- Unit test coverage and key test cases
-- Integration test scenarios
-- E2E test flows
+- Unit tests: [Location and coverage %]
+- Integration tests: [Location and coverage %]
 
-### Known Issues
-- Current bugs or limitations
-- Workarounds in place
-- Technical debt items
-
----
+### Key Test Scenarios
+- [Scenario 1]
+- [Scenario 2]
 
 ## Dependencies
 
-### External Dependencies
-- Third-party services or APIs
-- Libraries and frameworks
-- Infrastructure requirements
+### Required Dependencies
+- [Dependency 1]: [Version and purpose]
+- [Dependency 2]: [Version and purpose]
 
-### Internal Dependencies
-- Other features or modules
-- Shared services or utilities
-- Database or storage requirements
-
----
+### Integration Points
+- [System/Module 1]: [How it integrates]
+- [System/Module 2]: [How it integrates]
 
 ## Performance & Scalability
 
-- Current performance characteristics
-- Scalability considerations
-- Optimization opportunities
-
----
+[Performance characteristics, limits, optimization notes]
 
 ## Security & Compliance
 
-- Authentication and authorization
-- Data privacy considerations
-- Compliance requirements (if applicable)
-
----
+[Security considerations, data handling, compliance requirements]
 
 ## Future Enhancements
 
-### Planned Improvements
-- Upcoming features or changes
-- Technical debt to address
-- Performance optimizations
-
-### Potential Expansions
-- Ideas for future development
-- User requests or feedback
-- Architectural improvements
-
----
+[Planned improvements, known limitations, roadmap items]
 
 ## Related Documentation
 
-- Related features: `docs/features/related-feature.md`
-- API documentation: `docs/api/endpoints.md`
-- Architecture docs: `docs/architecture/system-design.md`
+- [Link to related features]
+- [Link to guides]
+- [Link to API docs]
 
 ---
 
-*This is a living document - update it as the feature evolves*
-*Last reviewed: {date} by {reviewer}*
+*Last updated: [Date] | Status: [Status] | Version: [Version]*
