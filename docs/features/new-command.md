@@ -22,6 +22,7 @@ The `cdd new` command guarantees that every ticket and documentation file follow
 **Key Capabilities:**
 - Creates 4 ticket types with spec.yaml (feature, bug, spike, enhancement)
 - Creates 2 documentation types with markdown templates (guides, features)
+- Auto-populates creation/update dates in ticket templates
 - Enforces naming conventions (lowercase-with-dashes)
 - Validates git repository and template availability
 - Handles overwrites safely with user prompts
@@ -36,7 +37,7 @@ The `cdd new` command guarantees that every ticket and documentation file follow
 **User Perspective:**
 1. User runs command → System validates environment and normalizes name
 2. System checks for conflicts → Prompts for overwrite/rename if needed
-3. System creates file(s) from template → Displays success with next steps
+3. System creates file(s) from template → Auto-populates dates for tickets → Displays success with next steps
 
 **Input → Output:**
 ```
@@ -99,6 +100,7 @@ File System (specs/, docs/) - Generated files
   - `get_git_root() -> Path` - Finds git repository root directory
   - `get_template_path(git_root, ticket_type) -> Path` - Locates ticket template file
   - `get_documentation_template_path(git_root, doc_type) -> Path` - Locates doc template file
+  - `populate_template_dates(template_content) -> str` - Replaces [auto-generated] with current date
   - `prompt_overwrite() -> bool` - Asks user to confirm overwrite
   - `prompt_new_name(ticket_type) -> str | None` - Asks for alternative name
   - `create_ticket_file(ticket_path, template_path)` - Writes spec.yaml from template
@@ -164,10 +166,12 @@ cdd new documentation guide "API Reference"
 # If file/directory exists, system prompts:
 $ cdd new feature user-auth
 
-⚠️  Ticket already exists: specs/tickets/feature-user-auth
+⚠️  Ticket already exists: /path/to/project/specs/tickets/feature-user-auth
 
-Overwrite existing ticket? [y/N]: n
-Enter new ticket name (or 'cancel'): user-auth-v2
+Ticket already exists. Overwrite? [y/N]: n
+
+💡 Tip: Type 'cancel' or press Ctrl+C to abort
+Enter a different name for the feature ticket: user-auth-v2
 
 ✅ Created: specs/tickets/feature-user-auth-v2/spec.yaml
 ```
@@ -320,6 +324,32 @@ template = get_template_path(git_root, "feature")
 
 ---
 
+### `populate_template_dates(template_content: str) -> str`
+
+**Purpose:** Replaces `[auto-generated]` placeholders with current date in YYYY-MM-DD format.
+
+**Parameters:**
+- `template_content` (str): Raw template content with `[auto-generated]` placeholders
+
+**Returns:** `str` - Template content with dates populated
+
+**Behavior:**
+- Finds all instances of `[auto-generated]` in template
+- Replaces with current date (e.g., "2025-11-02")
+- Used for both `created` and `updated` fields in ticket spec.yaml files
+- **Not used for documentation files** (docs are living and continuously updated)
+
+**Example:**
+```python
+template = "created: [auto-generated]\nupdated: [auto-generated]"
+result = populate_template_dates(template)
+# Returns: "created: 2025-11-02\nupdated: 2025-11-02"
+```
+
+**Location:** `src/cddoc/new_ticket.py:114-131`
+
+---
+
 ### `get_documentation_template_path(git_root: Path, doc_type: str) -> Path`
 
 **Purpose:** Locates the template file for a given documentation type.
@@ -351,7 +381,7 @@ template = get_documentation_template_path(git_root, "guide")
 **Returns:** `bool` - True if user confirms overwrite, False otherwise
 
 **Behavior:**
-- Displays: "Overwrite existing ticket? [y/N]:"
+- Displays: "Ticket already exists. Overwrite? [y/N]:"
 - Default is 'N' (safe default - don't overwrite)
 - Accepts 'y', 'yes', 'Y', 'YES' as confirmation
 
@@ -371,7 +401,8 @@ template = get_documentation_template_path(git_root, "guide")
 - `None` - If user cancels operation
 
 **Behavior:**
-- Displays: "Enter new ticket name (or 'cancel'):"
+- Displays tip: "💡 Tip: Type 'cancel' or press Ctrl+C to abort"
+- Prompts: "Enter a different name for the {ticket_type} ticket:"
 - Returns None if user types 'cancel' or presses Ctrl+C
 - Returns new name string for retry
 
