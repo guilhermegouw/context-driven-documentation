@@ -317,16 +317,9 @@ def initialize_project(
             "Creating missing items only.[/yellow]"
         )
 
-    # Create directory structure
     created_dirs = create_directory_structure(target_path)
-
-    # Install framework commands
     installed_commands = install_framework_commands(target_path)
-
-    # Install templates
     installed_templates = install_templates(target_path)
-
-    # Generate CLAUDE.md
     claude_md_created = generate_claude_md(target_path, force)
 
     return {
