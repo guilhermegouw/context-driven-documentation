@@ -128,22 +128,32 @@ def _display_next_steps(project_path):
    • [cyan].claude/commands/[/cyan] - AI agents (socrates, plan, exec)
    • [cyan].cdd/templates/[/cyan] - Internal templates
 
+🤖 [bold]Meet Socrates - Think Better, Document Faster[/bold]
+
+Stop writing specs alone. Socrates is your thinking partner:
+   ✓ Brainstorm through conversation, not forms
+   ✓ Uncover edge cases before they become bugs
+   ✓ Structure scattered thoughts into clear requirements
+   ✓ Stay focused on what matters
+
+Walk in with an idea. Walk out with a complete spec.
+
 🚀 [bold]Quick Start Workflow:[/bold]
 
-1. [yellow]Edit CLAUDE.md[/yellow] - Fill in your project details
-   Your project's foundation for all AI collaboration
+1. [yellow]Edit CLAUDE.md[/yellow] - Capture your project's context once, AI understands it forever
+   Tip: Brainstorm with [green]/socrates CLAUDE.md[/green] to build it together
 
 2. [yellow]Create a ticket:[/yellow] [green]cdd new feature user-auth[/green]
    Generates a ticket in specs/tickets/
 
-3. [yellow]Gather requirements:[/yellow] [green]/socrates[/green] (in Claude Code)
-   AI-guided conversation to complete spec.yaml
+3. [yellow]Gather requirements:[/yellow] [green]/socrates specs/tickets/feature-user-auth/spec.yaml[/green]
+   Brainstorm with Socrates - uncover edge cases, clarify scope, build complete specs
 
-4. [yellow]Generate plan:[/yellow] [green]/plan feature-user-auth[/green]
-   Creates detailed implementation plan
+4. [yellow]Generate plan:[/yellow] [green]/plan specs/tickets/feature-user-auth/spec.yaml[/green]
+   Clear spec → Detailed plan → Confident implementation
 
-5. [yellow]Implement:[/yellow] [green]/exec feature-user-auth[/green]
-   AI writes code from the plan!
+5. [yellow]Implement:[/yellow] [green]/exec specs/tickets/feature-user-auth/plan.md[/green]
+   Clear spec + Detailed plan = AI builds exactly what you need (not what it guesses)
 
 📚 [bold]Learn More:[/bold]
    [link]https://github.com/guilhermegouw/context-driven-documentation[/link]
@@ -161,19 +171,22 @@ def _display_next_steps(project_path):
 @main.command()
 @click.argument(
     "ticket_type",
-    type=click.Choice(["feature", "bug", "spike"], case_sensitive=False),
+    type=click.Choice(
+        ["feature", "bug", "spike", "enhancement"], case_sensitive=False
+    ),
 )
 @click.argument("name")
 def new(ticket_type, name):
     """Create a new ticket specification file.
 
-    TICKET_TYPE: Type of ticket (feature, bug, or spike)
+    TICKET_TYPE: Type of ticket (feature, bug, spike, or enhancement)
     NAME: Name for the ticket (will be auto-normalized)
 
     Examples:
         cdd new feature user-authentication
         cdd new bug "Payment Processing Error"
         cdd new spike api_performance_investigation
+        cdd new enhancement improve-error-messages
 
     The command will:
     - Normalize the name to lowercase-with-dashes format
