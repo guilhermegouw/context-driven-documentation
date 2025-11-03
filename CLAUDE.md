@@ -26,7 +26,11 @@
 
 **Core Architectural Patterns:**
 - **Handler Pattern**: Separate handlers for different file types (ConstitutionHandler, TicketSpecHandler, etc.) - each knows how to work with its specific file format
-- **Command Pattern**: CLI commands via Click (`cdd init`, etc.) for tooling operations
+- **Command Pattern**: CLI commands via Click for tooling operations
+  - `cdd init` - Framework initialization (options: --force, --minimal)
+  - `cdd new` - Ticket and documentation creation with 6 variants:
+    - Tickets: feature, bug, spike, enhancement
+    - Documentation: guide, feature
 - **Slash Commands**: AI-driven commands (`/socrates`, `/plan`) that turn Claude into specialized personas for intelligent conversations
   - `/socrates` - Interactive requirements gathering through natural conversation
   - `/plan` - Autonomous implementation planning with minimal questions
@@ -44,12 +48,106 @@
 - `src/cddoc/cli.py` - CLI command definitions
 - `src/cddoc/handlers/` - File type handlers (one per file type)
 - `.claude/commands/` - Slash command definitions for AI personas
-- `.cddoc/templates/` - File templates that define structure
+- `.cdd/templates/` - Internal templates for tickets and documentation
+  - Ticket templates: feature, bug, spike, enhancement (YAML with spec.yaml structure)
+  - Documentation templates: guide, feature (Markdown)
+  - Constitution template: constitution-template.md
 
 **Integration Points:**
 - Claude Code (AI assistant) - primary interface
 - Git (version control) - documentation lives in repos
 - Local file system - all operations are file-based
+
+## Mechanical Layer Commands
+
+The mechanical layer consists of CLI commands that generate files with predictable structure. These commands are deterministic, fast, and require no AI interaction.
+
+### Framework Initialization
+
+**`cdd init [PATH]`** - Initialize CDD structure in a project
+
+**Purpose:** Sets up complete CDD framework with directories, templates, and slash commands
+
+**Options:**
+- `--force` - Overwrite existing files (use with caution)
+- `--minimal` - Create only essential structure, skip templates
+- `PATH` - Target directory (defaults to current directory)
+
+**What it creates:**
+- `CLAUDE.md` - Project constitution template
+- `specs/tickets/` - Directory for temporary sprint work tickets
+- `docs/features/` - Living feature documentation
+- `docs/guides/` - User guides and how-to documentation
+- `.claude/commands/` - AI agent slash commands (socrates, plan, exec)
+- `.cdd/templates/` - Internal templates for tickets and documentation
+
+**Behavior:**
+- Detects git root automatically (must be run inside git repository)
+- Safe by default - won't overwrite existing CLAUDE.md unless --force is used
+- Installs all framework components in a single operation
+
+### Ticket Creation
+
+**`cdd new <type> <name>`** - Create work tickets with spec.yaml
+
+**Ticket Types:**
+- `feature` - New functionality or capabilities
+- `bug` - Bug fixes and defect resolution
+- `spike` - Research, investigation, or proof-of-concept work
+- `enhancement` - Improvements to existing features
+
+**Creates:** `specs/tickets/<type>-<name>/spec.yaml`
+
+**Behavior:**
+- Auto-populates creation/update dates in spec.yaml
+- Normalizes names to lowercase-with-dashes format
+  - "User Auth System" → "user-auth-system"
+  - "payment_processing" → "payment-processing"
+- Prompts for overwrite/rename if ticket already exists
+- Validates git repository and template availability
+
+**Examples:**
+```bash
+cdd new feature user-authentication
+cdd new bug "Payment Processing Error"
+cdd new spike oauth-provider-comparison
+cdd new enhancement improve-error-messages
+```
+
+### Documentation Creation
+
+**`cdd new documentation <type> <name>`** - Create living documentation files
+
+**Documentation Types:**
+- `guide` - User-facing guides, tutorials, how-to documentation
+  - Creates: `docs/guides/<name>.md`
+- `feature` - Technical feature documentation, implementation details
+  - Creates: `docs/features/<name>.md`
+
+**Behavior:**
+- Same name normalization as tickets (lowercase-with-dashes)
+- No date population (documentation is living and continuously updated)
+- Prompts for overwrite/rename if file already exists
+
+**Examples:**
+```bash
+cdd new documentation guide getting-started
+cdd new documentation feature authentication
+```
+
+### Naming Convention Enforcement
+
+All `cdd new` commands automatically normalize names:
+
+**Algorithm:**
+1. Convert to lowercase
+2. Replace spaces, underscores, special chars with dashes
+3. Remove duplicate consecutive dashes
+4. Strip leading/trailing dashes
+
+**Validation:**
+- Names must contain at least one alphanumeric character after normalization
+- Empty or all-special-character names are rejected with clear error message
 
 ## Technology Stack & Constraints
 
