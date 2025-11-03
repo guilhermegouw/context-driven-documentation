@@ -522,6 +522,125 @@ Next steps: [Suggest appropriate next action]
 - Impact Assessment
 - Investigation Notes
 
+#### Context-Aware Bug Handling
+
+**NEW: Automatic Related Feature Context Loading**
+
+When gathering requirements for bug tickets, Socrates can automatically load context from related features to avoid redundant explanations.
+
+**How It Works:**
+
+1. **Socrates asks about relationships:**
+   After understanding the basic bug symptom:
+   ```
+   ❓ Is this bug related to an existing feature or ticket? If yes, which one?
+   ```
+
+2. **Developer provides ticket name:**
+   ```
+   Developer: "Yes, feature-user-auth"
+   ```
+
+3. **Socrates searches and loads context:**
+   - Checks `specs/archive/{ticket-name}/` first (completed features)
+   - Falls back to `specs/tickets/{ticket-name}/` if not archived
+   - Reads `spec.yaml` and `plan.md` from related ticket
+   - Loads full implementation context
+
+4. **Socrates shows concise confirmation:**
+   ```
+   ✅ Loaded context: feature-user-auth
+
+   Brief overview:
+   - Type: feature
+   - Summary: JWT-based authentication with bcrypt password hashing
+   - Key implementation: Auth middleware at src/auth/, JWT generation, bcrypt
+
+   Is this the right ticket? (Y/n)
+   ```
+
+5. **Developer confirms and continues:**
+   - If correct: Socrates adds `related_to: feature-user-auth` to bug spec.yaml
+   - If incorrect: Socrates asks for correct ticket name
+   - Socrates asks: "Is there any other ticket related to this bug?"
+   - Supports multiple related tickets: `related_to: [feature-auth, feature-sessions]`
+
+**What Developer Gains:**
+
+With context loaded, Socrates understands:
+- Original feature implementation details
+- Architecture decisions and patterns
+- File locations and structure
+- Technical patterns used
+
+**What Developer Doesn't Need to Re-Explain:**
+- ❌ How the feature works
+- ❌ System architecture
+- ❌ File structure
+- ❌ Implementation decisions
+
+**What Developer Only Explains:**
+- ✅ What's broken (specific bug behavior)
+- ✅ How to reproduce it
+- ✅ Impact and urgency
+- ✅ Environment details
+
+**Example Scenario:**
+
+**Without Context Loading (Old Way):**
+```
+Developer: Login returns 500 error
+Socrates: Tell me about your authentication system...
+Developer: *re-explains entire JWT implementation, bcrypt, middleware* 😫
+Socrates: What's the error?
+Developer: 500 on login
+... (long conversation re-explaining everything)
+```
+
+**With Context Loading (New Way):**
+```
+Developer: Login returns 500 error
+
+Socrates: ❓ Is this related to an existing feature?
+Developer: Yes, feature-user-auth
+
+Socrates: [Loads specs/archive/feature-user-auth/]
+✅ Loaded context: feature-user-auth
+Brief overview:
+- JWT-based authentication with bcrypt
+- Auth middleware at src/auth/
+
+Is this the right ticket?
+
+Developer: Yes
+
+Socrates: ❓ Any other related tickets?
+Developer: No
+
+Socrates: Perfect! I understand the auth system now.
+Let's focus on what's broken. Exact reproduction steps?
+
+Developer: *only explains the specific bug* 😊
+... (focused conversation, no redundant explanations)
+```
+
+**Benefits:**
+- **Massive DX improvement** - No re-explaining implementations
+- **Faster bug specs** - Focus only on what's broken
+- **Better context** - Socrates has full implementation knowledge
+- **Automatic tracking** - Bugs linked to features via metadata
+- **Preserved history** - Feature stays archived, bug gets own ticket
+
+**Metadata Tracking:**
+
+Bug spec.yaml includes relationship automatically:
+```yaml
+ticket:
+  type: bug
+  related_to: [feature-user-auth]  # Automatically added by Socrates
+  priority: high
+```
+
 ### 4. Spike Tickets (spec.yaml)
 
 **Purpose**: Research and investigation planning

@@ -262,6 +262,115 @@ Structure and familiarity over novelty - well-formatted, consistently styled cod
 4. Commit changes with descriptive messages
 5. Merge back to `main` when complete
 
+**Post-Completion Bug Workflow:**
+
+When bugs are found after a feature is completed and archived:
+
+1. **Create new bug ticket (don't restore archived feature):**
+   ```bash
+   cdd new bug <descriptive-bug-name>
+   /socrates bug-<name>
+   /plan bug-<name>
+   /exec bug-<name>
+   ```
+
+2. **Socrates loads context automatically:**
+   - During `/socrates` conversation, answer when asked: "Is this bug related to an existing feature?"
+   - Provide the related feature name (e.g., "feature-user-auth")
+   - Socrates will:
+     - Search archives first, then active tickets
+     - Load spec.yaml and plan.md from related ticket
+     - Show brief summary for confirmation
+     - Add `related_to` field to bug spec.yaml
+
+3. **Benefits of this approach:**
+   - **No re-explaining implementations** - Socrates understands the feature already
+   - **Proper template structure** - Bug ticket has correct bug template format
+   - **Preserved history** - Feature implementation history stays intact in archive
+   - **Clear relationships** - Bug automatically linked to related features via metadata
+   - **Faster specifications** - Focus only on what's broken, not how system works
+
+**Why separate tickets:**
+- Bug template gives AI proper context for bug requirements (reproduction, impact)
+- Feature template structure preserved for feature requirements (user stories, acceptance criteria)
+- Clean version control - separate history for feature implementation vs bug fix
+- Industry standard practice - bugs are distinct from features
+
+**Example flow:**
+```bash
+# Bug found after feature-user-auth was archived
+cdd new bug user-auth-login-500
+/socrates bug-user-auth-login-500
+# Socrates asks: "Is this related to an existing feature?"
+# You answer: "Yes, feature-user-auth"
+# Socrates loads feature context automatically
+# You only explain the bug - no need to re-explain authentication system
+/plan bug-user-auth-login-500
+/exec bug-user-auth-login-500
+```
+
+**Living Documentation Sync Workflow:**
+
+After features are implemented and archived, sync living documentation to keep it accurate:
+
+1. **Trigger documentation sync:**
+   ```bash
+   /sync-docs feature-user-auth
+   ```
+
+2. **Review AI-proposed updates:**
+   - Sync-Docs analyzes archived ticket (spec + plan + progress)
+   - Smart verification reads key interface files (APIs, configs, public interfaces)
+   - Proposes specific section updates with reasoning
+   - Shows what was implemented vs what's documented
+
+3. **Choose how to proceed:**
+   - **[Y] Apply all** - Accept all proposed updates, docs generated automatically
+   - **[E] Edit proposals** - Refine through Socratic conversation
+   - **[S] Show preview** - See detailed content before applying
+   - **[N] Skip** - Defer documentation update for later
+
+4. **Documentation updated automatically:**
+   - Feature docs reflect actual implementation
+   - APIs, configurations, usage documented accurately
+   - Living docs stay in sync with code
+
+**Benefits of sync workflow:**
+- **AI analyzes changes** - No manual comparison needed
+- **Smart verification** - Reads code to ensure accuracy
+- **Targeted proposals** - Specific updates, not overwhelming rewrites
+- **Human approval** - Review before applying changes
+- **Conversational refinement** - Can discuss and refine proposals
+- **Preserved context** - Uses archived ticket as source of truth
+
+**Smart verification approach:**
+- ✅ Reads: API routes, configuration files, public interfaces
+- ⏭️  Skips: Internal implementation, test files, utilities
+- 🎯 Documents: What users need (APIs, configs, usage, examples)
+- 🚫 Ignores: Internal details better left in code comments
+
+**Example flow:**
+```bash
+# Monday: Implement feature
+/exec feature-user-auth
+# ✅ Implementation complete, ticket archived
+
+# Tuesday: Sync documentation
+/sync-docs feature-user-auth
+# Sync-Docs analyzes implementation, proposes updates:
+#   1. Create API Reference section (3 endpoints discovered)
+#   2. Create Configuration section (5 options discovered)
+#   3. Create Usage Examples (from acceptance criteria)
+# [Y] Apply all
+# ✅ docs/features/authentication.md created with accurate details
+```
+
+**When to sync:**
+- After `/exec` completes and archives ticket
+- When you're ready to document (no rush - ticket context preserved)
+- Before marking work as fully complete
+- Periodically for features that evolved over multiple tickets
+
 **Development Environment:**
 - Poetry for dependency management
 - Virtual environments for isolation

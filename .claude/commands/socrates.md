@@ -573,6 +573,115 @@ If you hear these, **use progressive clarification before moving on**:
 - Assess impact: "Who's affected? How many users? How urgent is this?"
 - Find context: "When did this start? What changed recently?"
 
+#### Load Related Feature Context (For Bug Tickets)
+
+**CRITICAL FOR BUGS:** After understanding the basic bug symptom, check if it's related to an existing feature to avoid re-explaining entire implementations.
+
+**Step 1: Ask About Related Tickets**
+
+After initial bug understanding, ask:
+
+```markdown
+❓ Is this bug related to an existing feature or ticket? If yes, which one?
+```
+
+**Step 2: Search and Load Context (If Related)**
+
+If user provides a ticket name:
+
+1. **Search for the ticket (archive first, then active):**
+   - First check: `specs/archive/{ticket-name}/`
+   - If not found, check: `specs/tickets/{ticket-name}/`
+   - If still not found: "I couldn't find that ticket. Let me continue without additional context."
+
+2. **Load context files:**
+   ```
+   Read: {ticket-path}/spec.yaml
+   Read: {ticket-path}/plan.md
+   ```
+
+3. **Show concise confirmation:**
+   ```markdown
+   ✅ Loaded context: {ticket-name}
+
+   Brief overview:
+   - Type: {feature/bug/spike/enhancement}
+   - Summary: {1-2 sentence summary from spec}
+   - Key implementation: {1-2 key points from plan}
+
+   Is this the right ticket? (Y/n)
+   ```
+
+4. **Handle confirmation:**
+   - **If YES:** Add to bug spec metadata: `related_to: {ticket-name}`
+   - **If NO:** Ask for correct ticket name and repeat search
+
+5. **Ask about additional related tickets:**
+   ```markdown
+   ❓ Is there any other ticket related to this bug?
+   ```
+
+   If yes, repeat the search and load process. Track multiple tickets as:
+   ```yaml
+   related_to: [ticket-1, ticket-2, ...]
+   ```
+
+**Step 3: Continue Bug Conversation with Context**
+
+Now you have full context about:
+- Original feature implementation
+- Architecture decisions
+- File structure and code locations
+- Technical patterns used
+
+**User only needs to explain:**
+- What's broken (specific behavior)
+- How to reproduce it
+- Impact and urgency
+
+**Don't ask them to re-explain:**
+- How the feature works
+- What the architecture is
+- What files are involved
+
+**Example Flow:**
+
+```markdown
+You: /socrates bug-user-auth-login-500
+
+Socrates: Tell me about this bug - what's happening that shouldn't be?
+
+You: Login endpoint returns 500 error after deployment
+
+Socrates: ❓ Is this bug related to an existing feature or ticket?
+
+You: Yes, feature-user-auth
+
+Socrates: [Searches specs/archive/feature-user-auth/]
+          [Loads spec.yaml and plan.md]
+
+✅ Loaded context: feature-user-auth
+
+Brief overview:
+- Type: feature
+- Summary: JWT-based authentication with bcrypt password hashing
+- Key implementation: Auth middleware at src/auth/, JWT generation, bcrypt for passwords
+
+Is this the right ticket? (Y/n)
+
+You: Yes
+
+Socrates: ❓ Is there any other ticket related to this bug?
+
+You: No
+
+Socrates: Perfect! I understand the authentication system now.
+
+Let's focus on what's broken. What are the exact steps to reproduce this 500 error?
+
+[Continue bug conversation - Socrates already knows the implementation details]
+```
+
 ### 4. Spike Tickets (specs/tickets/**/spec.yaml)
 **Purpose**: Research and investigation planning
 

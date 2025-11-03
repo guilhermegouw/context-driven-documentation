@@ -123,7 +123,8 @@ def _display_next_steps(project_path):
 
 📁 Structure Created:
    • [cyan]CLAUDE.md[/cyan] - Project constitution (edit this first!)
-   • [cyan]specs/tickets/[/cyan] - Temporary sprint work
+   • [cyan]specs/tickets/[/cyan] - Active sprint work
+   • [cyan]specs/archive/[/cyan] - Completed tickets (auto-archived by /exec)
    • [cyan]docs/features/[/cyan] - Living documentation
    • [cyan].claude/commands/[/cyan] - AI agents (socrates, plan, exec)
    • [cyan].cdd/templates/[/cyan] - Internal templates

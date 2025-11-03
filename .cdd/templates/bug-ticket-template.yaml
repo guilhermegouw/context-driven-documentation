@@ -30,6 +30,7 @@ environment:
 ticket:
   type: bug
   priority: [critical/high/medium/low]
+  related_to: [] # List of related tickets (filled by Socrates when bug relates to existing features)
   created: [auto-generated]
   updated: [auto-generated]
   reported_by: [Who reported this]

@@ -98,8 +98,8 @@ Documentation has a simpler workflow - no spec/plan/exec phases:
 
 ```bash
 # Create a guide or feature doc
-cdd documentation guide getting-started
-cdd documentation feature authentication
+cdd new documentation guide getting-started
+cdd new documentation feature authentication
 
 # Fill it with Socrates
 /socrates docs/guides/getting-started.md
@@ -127,10 +127,12 @@ When you run `cdd init`, you get a simple, git-friendly structure:
 my-project/
 ├── CLAUDE.md              # Project constitution (always loaded by AI)
 ├── specs/
-│   └── tickets/           # Current sprint work
-│       └── feature-auth/
-│           ├── spec.yaml  # Requirements from conversation
-│           └── plan.md    # AI-generated implementation plan
+│   ├── tickets/           # Active sprint work
+│   │   └── feature-auth/
+│   │       ├── spec.yaml  # Requirements from conversation
+│   │       ├── plan.md    # AI-generated implementation plan
+│   │       └── progress.yaml  # Implementation progress (created by /exec)
+│   └── archive/           # Completed tickets (auto-archived by /exec)
 └── docs/
     ├── features/          # Living feature documentation
     │   └── authentication.md
@@ -171,6 +173,7 @@ Each ticket is a folder containing:
 - `cdd new feature` - New functionality with user stories and acceptance criteria
 - `cdd new bug` - Bug reports with reproduction steps and impact assessment
 - `cdd new spike` - Research tasks with questions and success criteria
+- `cdd new enhancement` - Improvements to existing features
 
 ### **Docs - Living Documentation**
 

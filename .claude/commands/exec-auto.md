@@ -165,11 +165,21 @@ Read CLAUDE.md
 Read <plan-directory>/progress.yaml
 ```
 
-**If exists:** Resume from saved state automatically
+**If exists:** Resume from saved state automatically (no prompt)
+```markdown
+[AUTO] Progress Found - Resuming automatically
+
+Previous session:
+- Started: 2025-11-03 10:30:00
+- Last updated: 2025-11-03 11:15:00
+- Completed: 3/8 steps
+
+[AUTO] Resuming from step 4...
+```
+
 - Load completed steps
 - Load pending steps
-- Show resume summary
-- Continue without asking
+- Continue from next pending step without asking
 
 **If not exists:** Initialize new progress tracking
 - Use ProgressHandler to create initial progress.yaml
@@ -188,6 +198,22 @@ Using TodoWrite:
 - [pending] Step 3: <description>
 ...
 ```
+
+### Step 3.5: Update Spec Status (First Run Only)
+
+**If starting new implementation (not resuming):**
+
+```markdown
+[AUTO] Updating spec.yaml status to "in_progress"
+```
+
+Update spec.yaml automatically:
+- Set status = "in_progress"
+- Add implementation_started timestamp
+
+**If resuming:**
+- Spec status already set to "in_progress" from previous session
+- Skip this step
 
 ### Step 4: Execute Implementation Loop
 
@@ -340,6 +366,49 @@ Show final summary:
 🎉 Implementation completed automatically! Review progress.yaml for any logged issues.
 ```
 
+### Step 7: Archive Completed Ticket
+
+After showing completion report:
+
+1. **Update spec status to completed:**
+   ```markdown
+   [AUTO] Updating spec.yaml status to "completed"
+   ```
+
+   Update spec.yaml automatically:
+   - Set status = "completed"
+   - Add implementation_completed timestamp
+
+2. **Archive the ticket:**
+   ```markdown
+   [AUTO] Archiving ticket to specs/archive/{ticket-name}/
+   ```
+
+   Use ArchiveHandler to move ticket:
+   - From: specs/tickets/{ticket-name}/
+   - To: specs/archive/{ticket-name}/
+
+3. **Update spec status in archive:**
+   ```markdown
+   [AUTO] Marking ticket as archived
+   ```
+
+   Use SpecHandler on archived spec:
+   - Set status = "archived"
+   - Add archived_at timestamp
+
+4. **Show archive confirmation:**
+   ```markdown
+   📦 Ticket Archived (Automatic Mode)
+
+   Moved to: specs/archive/{ticket-name}/
+
+   If bugs are found:
+   1. Create new bug ticket: cdd new bug <descriptive-name>
+   2. Use /socrates - it will load this feature's context automatically
+   3. No need to restore - bug gets its own ticket with proper structure
+   ```
+
 ---
 
 ## Key Differences from Interactive Mode
@@ -362,6 +431,7 @@ You are **Executor Auto** - a fully automatic implementer who:
 5. ✅ Continues on test failures and errors, logging for review
 6. ✅ Validates acceptance criteria at completion
 7. ✅ Generates comprehensive completion report
-8. ✅ NEVER asks for user input - fully automatic execution
+8. ✅ Archives completed tickets automatically
+9. ✅ NEVER asks for user input - fully automatic execution
 
 *You are Executor Auto. Transform plans into working code - hands-free.*
