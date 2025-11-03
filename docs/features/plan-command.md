@@ -84,7 +84,7 @@ Load spec.yaml (requirements)
     ↓
 Load CLAUDE.md (project context)
     ↓
-Detect ticket type (feature/bug/spike)
+Detect ticket type (feature/bug/spike/enhancement)
     ↓
 Load appropriate template
     ↓
@@ -109,7 +109,7 @@ Show summary
 - **Step 1**: Read spec.yaml (extract requirements, acceptance criteria, scope)
 - **Step 2**: Read CLAUDE.md (tech stack, patterns, conventions, constraints)
 - **Step 3**: Detect ticket type from spec.yaml (`type: feature|bug|spike|enhancement`)
-- **Step 4**: Load appropriate template (feature-plan, bug-plan, spike-plan)
+- **Step 4**: Load appropriate template (feature-plan, bug-plan, spike-plan, enhancement-plan)
 - **Step 5**: Analyze codebase with strict limits:
   - Max 10 files examined
   - Max 3 glob searches
@@ -198,9 +198,9 @@ Additional:
 
 **Plan Template System:**
 
-**Three Template Types:**
+**Four Template Types:**
 
-1. **Feature Plans** (`.cddoc/templates/feature-plan-template.md`)
+1. **Feature Plans** (`.cdd/templates/feature-plan-template.md`)
    - Implementation Overview
    - Technical Decisions (documented with rationale)
    - File Structure (exact paths for new/modified/reference files)
@@ -212,7 +212,7 @@ Additional:
    - Dependencies (exact package names and versions)
    - Effort Estimation (breakdown by activity, assumptions, risks)
 
-2. **Bug Plans** (`.cddoc/templates/bug-plan-template.md`)
+2. **Bug Plans** (`.cdd/templates/bug-plan-template.md`)
    - Bug Analysis (symptom, expected behavior, impact)
    - Root Cause Analysis (hypothesis, evidence, likely location)
    - Investigation Approach (step-by-step, what to examine)
@@ -223,7 +223,7 @@ Additional:
    - Rollback Plan (how to safely revert)
    - Effort Estimation
 
-3. **Spike Plans** (`.cddoc/templates/spike-plan-template.md`)
+3. **Spike Plans** (`.cdd/templates/spike-plan-template.md`)
    - Research Objectives (questions, decisions to inform, success criteria)
    - Investigation Scope (in/out of scope, timebox)
    - Research Methods (how to investigate, time allocation)
@@ -231,6 +231,15 @@ Additional:
    - Evaluation Criteria (metrics, trade-offs, decision factors)
    - Deliverables (documents, prototypes, recommendations format)
    - Effort Estimation (research, prototyping, documentation times)
+
+4. **Enhancement Plans** (`.cdd/templates/enhancement-plan-template.md`)
+   - Current State Analysis (how it works today, limitations)
+   - Proposed Improvements (desired state, benefits)
+   - Technical Decisions (approach, rationale, alternatives)
+   - Impact Assessment (breaking changes, affected components, backward compatibility)
+   - Implementation Steps (phased approach with validation)
+   - Success Metrics (how to measure improvement)
+   - Effort Estimation
 
 ---
 

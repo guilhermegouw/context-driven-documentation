@@ -39,25 +39,78 @@ Transform a spec.yaml file into a comprehensive implementation plan (plan.md) th
 
 ## How to Generate a Plan
 
-### Step 1: Parse Command & Extract Path
+### Step 1: Parse Command & Resolve Path
 
-The user will invoke you with:
+The user will invoke you with either:
+- **Shorthand:** `/plan feature-user-auth` (recommended - faster, more natural)
+- **Full path:** `/plan specs/tickets/feature-user-auth/spec.yaml` (also supported)
+
+**Smart Path Resolution:**
+
+Apply the following logic to resolve the user's argument:
+
+1. **If argument contains `/` OR ends with `.md` or `.yaml`:**
+   - Treat as explicit path → Use as-is
+   - Example: `specs/tickets/feature-x/spec.yaml` → `specs/tickets/feature-x/spec.yaml`
+   - Example: `CLAUDE.md` → `CLAUDE.md`
+
+2. **Otherwise (ticket shorthand):**
+   - Resolve to: `specs/tickets/{argument}/spec.yaml`
+   - Example: `feature-user-auth` → `specs/tickets/feature-user-auth/spec.yaml`
+   - Example: `bug-login-error` → `specs/tickets/bug-login-error/spec.yaml`
+
+3. **Validate the resolved path:**
+   - Check if the ticket directory exists at `specs/tickets/{ticket-name}/`
+   - If not found → Provide helpful error with fuzzy matching (see below)
+
+**Error Handling (When Ticket Not Found):**
+
+If the ticket directory doesn't exist, search for similar tickets using fuzzy matching:
+
+```python
+# Pseudo-code for fuzzy matching logic:
+# - Scan specs/tickets/ directory for all ticket names
+# - Use difflib.get_close_matches() with 70% similarity threshold
+# - Return top 3 matches
+```
+
+**Error Message Format:**
+
+```markdown
+❌ Ticket not found: {ticket-name}
+
+Did you mean:
+• {similar-ticket-1} → /plan {similar-ticket-1}
+• {similar-ticket-2} → /plan {similar-ticket-2}
+• {similar-ticket-3} → /plan {similar-ticket-3}
+
+Or create it: cdd new <type> {ticket-name}
+```
+
+**If no similar tickets found:**
+
+```markdown
+❌ Ticket not found: {ticket-name}
+
+No existing tickets found.
+Did you forget to create it?
+
+Run: cdd new feature {ticket-name}
+     cdd new enhancement {ticket-name}
+     cdd new bug {ticket-name}
+```
+
+**Examples:**
 
 ```
-/plan <path-to-spec.yaml>
-```
+User: /plan feature-user-auth
+You: [Resolve: specs/tickets/feature-user-auth/spec.yaml]
 
-**Your Actions:**
+User: /plan CLAUDE.md
+You: [Use as-is: CLAUDE.md]
 
-1. Extract the spec.yaml file path from the command
-2. Validate the path exists and is readable
-3. If path is invalid, show error with correct usage
-
-**Example:**
-
-```
-User: /plan specs/tickets/user-auth/spec.yaml
-You: [Extract path: specs/tickets/user-auth/spec.yaml]
+User: /plan feat-auth  (typo - ticket doesn't exist)
+You: [Show error with suggestion: "Did you mean: feature-user-auth?"]
 ```
 
 ---
@@ -106,18 +159,19 @@ Read CLAUDE.md
 
 ```yaml
 ticket:
-  type: feature  # or bug, or spike
+  type: feature  # or bug, spike, or enhancement
 ```
 
-**If type is missing:** Ask user which type (feature/bug/spike)
+**If type is missing:** Ask user which type (feature/bug/spike/enhancement)
 
 #### 2.4: Load Appropriate Template
 
 Based on ticket type:
 
-- Feature → Read `.cddoc/templates/feature-plan-template.md`
-- Bug → Read `.cddoc/templates/bug-plan-template.md`
-- Spike → Read `.cddoc/templates/spike-plan-template.md`
+- Feature → Read `.cdd/templates/feature-plan-template.md`
+- Bug → Read `.cdd/templates/bug-plan-template.md`
+- Spike → Read `.cdd/templates/spike-plan-template.md`
+- Enhancement → Read `.cdd/templates/enhancement-plan-template.md`
 
 **Purpose:** Understand the structure you'll populate
 
@@ -805,6 +859,7 @@ I couldn't detect the ticket type from spec.yaml. Please specify:
 - **feature** - New functionality to build
 - **bug** - Issue to fix
 - **spike** - Research/investigation to conduct
+- **enhancement** - Improvement to existing feature
 
 Which type is this?
 ````
@@ -834,7 +889,7 @@ Should I proceed with a generic plan, or would you like to set up CLAUDE.md firs
 ```markdown
 ❌ Error: Plan template not found
 
-Expected: `.cddoc/templates/[feature|bug|spike]-plan-template.md`
+Expected: `.cdd/templates/[feature|bug|spike|enhancement]-plan-template.md`
 Found: [None]
 
 This might mean:

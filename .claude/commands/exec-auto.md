@@ -37,22 +37,80 @@ Implement code from a detailed plan.md file automatically, tracking progress, en
 
 ## How to Execute Implementation
 
-### Step 1: Parse Command & Extract Plan Path
+### Step 1: Parse Command & Resolve Path
 
-The user will invoke you with:
-```
-/exec-auto <path-to-plan.md>
+The user will invoke you with either:
+- **Shorthand:** `/exec-auto feature-user-auth` (recommended - faster, more natural)
+- **Full path:** `/exec-auto specs/tickets/feature-user-auth/plan.md` (also supported)
+
+**Smart Path Resolution:**
+
+Apply the following logic to resolve the user's argument:
+
+1. **If argument contains `/` OR ends with `.md` or `.yaml`:**
+   - Treat as explicit path → Use as-is
+   - Example: `specs/tickets/feature-x/plan.md` → `specs/tickets/feature-x/plan.md`
+
+2. **Otherwise (ticket shorthand):**
+   - Resolve to: `specs/tickets/{argument}/plan.md`
+   - Example: `feature-user-auth` → `specs/tickets/feature-user-auth/plan.md`
+   - Example: `bug-login-error` → `specs/tickets/bug-login-error/plan.md`
+
+3. **Validate the resolved path:**
+   - Check if the plan.md file exists at the resolved path
+   - If not found → Provide helpful error with fuzzy matching and STOP
+
+**Error Handling (When Plan Not Found):**
+
+If the plan.md file doesn't exist, search for similar tickets using fuzzy matching:
+
+```python
+# Pseudo-code for fuzzy matching logic:
+# - Scan specs/tickets/ directory for all ticket names
+# - Use difflib.get_close_matches() with 70% similarity threshold
+# - Return top 3 matches
 ```
 
-**Your Actions:**
-1. Extract the plan.md file path from command
-2. Validate path exists and is readable
-3. If path is invalid, show error and STOP:
+**Error Message Format:**
 
-```
-Error: Plan file not found
-Expected path: <provided-path>
+```markdown
+❌ Plan not found: {ticket-name}
+
+Did you mean:
+• {similar-ticket-1} → /exec-auto {similar-ticket-1}
+• {similar-ticket-2} → /exec-auto {similar-ticket-2}
+• {similar-ticket-3} → /exec-auto {similar-ticket-3}
+
+Or generate a plan first: /plan {ticket-name}
+
 Cannot proceed without valid plan file.
+```
+
+**If no similar tickets found:**
+
+```markdown
+❌ Plan not found: {ticket-name}
+
+No existing tickets found.
+Did you forget to create a plan?
+
+Run: /plan {ticket-name}
+     (Or create ticket first: cdd new feature {ticket-name})
+
+Cannot proceed without valid plan file.
+```
+
+**Examples:**
+
+```
+User: /exec-auto feature-user-auth
+You: [Resolve: specs/tickets/feature-user-auth/plan.md]
+
+User: /exec-auto specs/tickets/bug-fix/plan.md
+You: [Use as-is: specs/tickets/bug-fix/plan.md]
+
+User: /exec-auto feat-auth  (typo - ticket doesn't exist)
+You: [Show error with suggestion: "Did you mean: feature-user-auth?" and STOP]
 ```
 
 ### Step 2: Load Context

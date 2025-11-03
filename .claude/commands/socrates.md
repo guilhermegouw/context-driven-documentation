@@ -47,6 +47,84 @@ Help developers create comprehensive specifications through intelligent conversa
 
 ## How to Conduct a Session
 
+### 0. Parse Command & Resolve Path
+
+The user will invoke you with either:
+- **Shorthand:** `/socrates feature-user-auth` (recommended - faster, more natural)
+- **Full path:** `/socrates specs/tickets/feature-user-auth/spec.yaml` (also supported)
+- **Documentation:** `/socrates CLAUDE.md` or `/socrates docs/features/auth.md`
+
+**Smart Path Resolution:**
+
+Apply the following logic to resolve the user's argument:
+
+1. **If argument contains `/` OR ends with `.md` or `.yaml`:**
+   - Treat as explicit path → Use as-is
+   - Example: `specs/tickets/feature-x/spec.yaml` → `specs/tickets/feature-x/spec.yaml`
+   - Example: `CLAUDE.md` → `CLAUDE.md`
+   - Example: `docs/features/auth.md` → `docs/features/auth.md`
+
+2. **Otherwise (ticket shorthand):**
+   - Resolve to: `specs/tickets/{argument}/spec.yaml`
+   - Example: `feature-user-auth` → `specs/tickets/feature-user-auth/spec.yaml`
+   - Example: `bug-login-error` → `specs/tickets/bug-login-error/spec.yaml`
+
+3. **Validate the resolved path:**
+   - Check if the ticket directory exists at `specs/tickets/{ticket-name}/`
+   - If not found → Provide helpful error with fuzzy matching (see below)
+
+**Error Handling (When Ticket Not Found):**
+
+If the ticket directory doesn't exist, search for similar tickets using fuzzy matching:
+
+```python
+# Pseudo-code for fuzzy matching logic:
+# - Scan specs/tickets/ directory for all ticket names
+# - Use difflib.get_close_matches() with 70% similarity threshold
+# - Return top 3 matches
+```
+
+**Error Message Format:**
+
+```markdown
+❌ Ticket not found: {ticket-name}
+
+Did you mean:
+• {similar-ticket-1} → /socrates {similar-ticket-1}
+• {similar-ticket-2} → /socrates {similar-ticket-2}
+• {similar-ticket-3} → /socrates {similar-ticket-3}
+
+Or create it: cdd new <type> {ticket-name}
+```
+
+**If no similar tickets found:**
+
+```markdown
+❌ Ticket not found: {ticket-name}
+
+No existing tickets found.
+Did you forget to create it?
+
+Run: cdd new feature {ticket-name}
+     cdd new enhancement {ticket-name}
+     cdd new bug {ticket-name}
+```
+
+**Examples:**
+
+```
+User: /socrates feature-user-auth
+You: [Resolve: specs/tickets/feature-user-auth/spec.yaml]
+
+User: /socrates CLAUDE.md
+You: [Use as-is: CLAUDE.md]
+
+User: /socrates feat-auth  (typo - ticket doesn't exist)
+You: [Show error with suggestion: "Did you mean: feature-user-auth?"]
+```
+
+---
+
 ### 1. Initialize - Intelligent Context Loading
 
 **CRITICAL: Don't start conversation blind. Load context in logical order.**
