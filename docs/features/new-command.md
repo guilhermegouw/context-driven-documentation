@@ -10,7 +10,7 @@
 
 ## Overview
 
-The `cdd new` command system is the **mechanical layer** of the CDD framework. It generates structured files from templates, ensuring consistency between what's created and how intelligent commands (Socrates, plan, exec) will use them.
+The `cdd new` command system is part of the **mechanical layer** of the CDD framework. It generates structured files from templates, ensuring consistency between what's created and how intelligent commands (Socrates, plan, exec) will use them.
 
 **Why it exists:**
 The CDD framework operates on two layers:
