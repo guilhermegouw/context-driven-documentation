@@ -43,7 +43,9 @@ def test_translations_format_strings_portuguese():
     t = get_translations("pt-br")
 
     # Test format string
-    message = t.ticket_exists_warning.format(ticket_path="/caminho/para/ticket")
+    message = t.ticket_exists_warning.format(
+        ticket_path="/caminho/para/ticket"
+    )
     assert "/caminho/para/ticket" in message
 
 
