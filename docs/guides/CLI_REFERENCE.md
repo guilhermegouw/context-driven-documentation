@@ -7,7 +7,7 @@ Complete reference for all CDD framework commands.
 ## Installation
 
 ```bash
-pip install cdd
+pip install cdd-claude
 ```
 
 **Requirements:**

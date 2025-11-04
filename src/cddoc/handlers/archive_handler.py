@@ -112,6 +112,4 @@ class ArchiveHandler:
         if not archive_base.exists():
             return []
 
-        return [
-            p for p in archive_base.iterdir() if p.is_dir()
-        ]
+        return [p for p in archive_base.iterdir() if p.is_dir()]

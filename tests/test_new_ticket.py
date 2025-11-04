@@ -122,7 +122,7 @@ class TestGetTemplatePath:
     def test_template_exists(self, tmp_path):
         """Test when template file exists."""
         # Create template
-        templates_dir = tmp_path / ".cddoc" / "templates"
+        templates_dir = tmp_path / ".cdd" / "templates"
         templates_dir.mkdir(parents=True)
         template_file = templates_dir / "feature-ticket-template.yaml"
         template_file.write_text("test")
@@ -138,7 +138,7 @@ class TestGetTemplatePath:
 
     def test_all_ticket_types(self, tmp_path):
         """Test all three ticket types."""
-        templates_dir = tmp_path / ".cddoc" / "templates"
+        templates_dir = tmp_path / ".cdd" / "templates"
         templates_dir.mkdir(parents=True)
 
         for ticket_type in ["feature", "bug", "spike"]:
@@ -268,7 +268,7 @@ class TestCreateNewTicket:
         )
 
         # Create template
-        templates_dir = tmp_path / ".cddoc" / "templates"
+        templates_dir = tmp_path / ".cdd" / "templates"
         templates_dir.mkdir(parents=True)
         template_file = templates_dir / "feature-ticket-template.yaml"
         template_file.write_text("created: [auto-generated]")
@@ -340,7 +340,7 @@ class TestIntegrationScenarios:
             ["git", "init"], cwd=tmp_path, check=True, capture_output=True
         )
 
-        templates_dir = tmp_path / ".cddoc" / "templates"
+        templates_dir = tmp_path / ".cdd" / "templates"
         templates_dir.mkdir(parents=True)
 
         for ticket_type in ["feature", "bug", "spike"]:
@@ -371,7 +371,7 @@ class TestIntegrationScenarios:
             ["git", "init"], cwd=tmp_path, check=True, capture_output=True
         )
 
-        templates_dir = tmp_path / ".cddoc" / "templates"
+        templates_dir = tmp_path / ".cdd" / "templates"
         templates_dir.mkdir(parents=True)
         template_file = templates_dir / "feature-ticket-template.yaml"
         template_file.write_text("test")

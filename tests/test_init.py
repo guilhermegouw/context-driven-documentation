@@ -190,7 +190,7 @@ def test_check_existing_structure_with_files(tmp_path):
 
 def test_create_directory_structure(tmp_path):
     """Test create_directory_structure creates all directories."""
-    created = create_directory_structure(tmp_path)
+    _ = create_directory_structure(tmp_path)
 
     expected_dirs = [
         "specs/tickets",

@@ -1,5 +1,10 @@
 # Context-Driven Documentation (CDD)
 
+[![PyPI version](https://badge.fury.io/py/cdd-claude.svg)](https://pypi.org/project/cdd-claude/)
+[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Tests](https://img.shields.io/badge/tests-111%20passed-brightgreen.svg)](https://github.com/guilhermegouw/context-driven-documentation)
+
 **Transform how you build software with AI pair programming**
 
 CDD is an AI-first development framework that makes human-AI collaboration feel natural, powerful, and productive. Create meaningful specifications through conversation, generate detailed implementation plans autonomously, and let AI write high-quality code - all while maintaining perfect context across your entire project.
@@ -44,7 +49,7 @@ AI Agents = "Intelligent assistants that know my project"
 ### Installation
 
 ```bash
-pip install cdd
+pip install cdd-claude
 ```
 
 ### Initialize Your Project
@@ -83,6 +88,7 @@ cdd new feature user-authentication
 
 # 4. Implement with full context
 /exec feature-user-authentication
+# (Or use /exec-auto for fully automatic, hands-free implementation)
 
 # AI writes code following your plan, architecture, and conventions
 
@@ -262,7 +268,8 @@ Everything lives in files you can version control, review, and share. No databas
 2. /socrates feature-name       → Conversational spec creation
 3. /plan feature-name           → AI generates implementation plan
 4. /exec feature-name           → AI implements with full context
-5. Documentation updates        → Living docs stay synchronized
+   (or /exec-auto for hands-free automatic implementation)
+5. /sync-docs feature-name      → Sync living documentation with implementation
 ```
 
 ---
@@ -343,6 +350,6 @@ Context captured once, understood forever
 
 ---
 
-**Transform your development workflow. Start with `pip install cdd`**
+**Transform your development workflow. Start with `pip install cdd-claude`**
 
 *Built for the AI-first development era. Made with ❤️ by developers who believe human-AI collaboration should feel natural.*

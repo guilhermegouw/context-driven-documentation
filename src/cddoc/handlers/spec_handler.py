@@ -82,9 +82,7 @@ class SpecHandler:
 
         # Ensure ticket section exists
         if "ticket" not in data:
-            raise SpecHandlerError(
-                "Spec file missing 'ticket' section"
-            )
+            raise SpecHandlerError("Spec file missing 'ticket' section")
 
         # Update status
         data["ticket"]["status"] = new_status

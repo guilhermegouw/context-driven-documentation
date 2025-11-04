@@ -1,6 +1,5 @@
 """Tests for archive handler."""
 
-from pathlib import Path
 
 import pytest
 
@@ -148,7 +147,9 @@ def test_restore_ticket_already_exists(tmp_path):
     existing_ticket.mkdir(parents=True)
 
     # Act & Assert
-    with pytest.raises(ArchiveHandlerError, match="already exists in active tickets"):
+    with pytest.raises(
+        ArchiveHandlerError, match="already exists in active tickets"
+    ):
         ArchiveHandler.restore_ticket(archive_folder, tickets_base)
 
 

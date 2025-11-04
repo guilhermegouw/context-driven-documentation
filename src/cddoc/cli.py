@@ -13,8 +13,26 @@ from .new_ticket import TicketCreationError, create_new_ticket
 console = Console()
 
 
+def get_version():
+    """Get package version, trying both package names."""
+    try:
+        from importlib.metadata import version
+    except ImportError:
+        # Python < 3.8
+        from importlib_metadata import version
+
+    # Try published package name first, fall back to dev name
+    try:
+        return version("cdd-claude")
+    except Exception:
+        try:
+            return version("cddoc")
+        except Exception:
+            return "0.1.0"
+
+
 @click.group()
-@click.version_option()
+@click.version_option(version=get_version())
 def main():
     """Context-Driven Documentation CLI."""
     pass
@@ -36,11 +54,6 @@ def init(path, force, minimal):
     """Initialize CDD structure in a project.
 
     PATH: Target directory for initialization (defaults to current directory)
-
-    Examples:
-        cdd init .              # Initialize in current directory
-        cdd init my-project     # Create and initialize new project
-        cdd init --minimal .    # Create structure without templates
     """
     console.print(
         Panel.fit(
