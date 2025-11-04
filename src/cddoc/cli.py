@@ -7,8 +7,10 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
 
+from .config import Config
 from .init import InitializationError, initialize_project
 from .new_ticket import TicketCreationError, create_new_ticket
+from .translations import get_translations
 
 console = Console()
 
@@ -55,6 +57,8 @@ def init(path, force, minimal):
 
     PATH: Target directory for initialization (defaults to current directory)
     """
+    # Note: Language selection happens during initialize_project()
+    # We don't load config/translations here because config doesn't exist yet
     console.print(
         Panel.fit(
             "🚀 [bold]Initializing Context-Driven Documentation[/bold]",
@@ -63,16 +67,20 @@ def init(path, force, minimal):
     )
 
     try:
-        # Initialize the project
+        # Initialize the project (includes language selection)
         result = initialize_project(path, force=force, minimal=minimal)
+
+        # Load translations based on selected language
+        language = result.get("language", "en")
+        t = get_translations(language)
 
         # Display results
         console.print()
-        _display_results(result)
+        _display_results(result, t)
 
         # Show next steps
         console.print()
-        _display_next_steps(result["path"])
+        _display_next_steps(result["path"], t)
 
         sys.exit(0)
 
@@ -84,11 +92,12 @@ def init(path, force, minimal):
         sys.exit(1)
 
 
-def _display_results(result: dict):
+def _display_results(result: dict, t):
     """Display initialization results in a formatted table.
 
     Args:
         result: Dictionary containing initialization results
+        t: Translation messages object
     """
     created_dirs = result.get("created_dirs", [])
     installed_commands = result.get("installed_commands", [])
@@ -96,87 +105,45 @@ def _display_results(result: dict):
     claude_md_created = result.get("claude_md_created", False)
 
     # Create summary table
-    table = Table(title="Initialization Summary", show_header=True)
-    table.add_column("Component", style="cyan", width=40)
-    table.add_column("Status", style="green", width=20)
+    table = Table(title=t.init_summary_title, show_header=True)
+    table.add_column(t.init_table_component, style="cyan", width=40)
+    table.add_column(t.init_table_status, style="green", width=20)
 
     # Add created directories
     for dir_path in created_dirs:
-        table.add_row(f"📁 {dir_path}", "✅ Created")
+        table.add_row(f"📁 {dir_path}", t.init_status_created)
 
     # Add CLAUDE.md
     if claude_md_created:
-        table.add_row("📄 CLAUDE.md", "✅ Created")
+        table.add_row("📄 CLAUDE.md", t.init_status_created)
     else:
-        table.add_row("📄 CLAUDE.md", "⚠️  Already exists")
+        table.add_row("📄 CLAUDE.md", t.init_status_exists)
 
     # Add framework commands
     for cmd_path in installed_commands:
-        table.add_row(f"🤖 {cmd_path}", "✅ Installed")
+        table.add_row(f"🤖 {cmd_path}", t.init_status_installed)
 
     # Add templates
     for template_path in installed_templates:
-        table.add_row(f"📋 {template_path}", "✅ Installed")
+        table.add_row(f"📋 {template_path}", t.init_status_installed)
 
     if table.row_count > 0:
         console.print(table)
     else:
-        console.print(
-            "[yellow]ℹ️  All directories and files already exist[/yellow]"
-        )
+        console.print(f"[yellow]{t.init_all_exists}[/yellow]")
 
 
-def _display_next_steps(project_path):
+def _display_next_steps(project_path, t):
     """Display next steps for the user.
 
     Args:
         project_path: Path where project was initialized
+        t: Translation messages object
     """
-    next_steps = """[bold]Your CDD Framework is Ready![/bold]
-
-📁 Structure Created:
-   • [cyan]CLAUDE.md[/cyan] - Project constitution (edit this first!)
-   • [cyan]specs/tickets/[/cyan] - Active sprint work
-   • [cyan]specs/archive/[/cyan] - Completed tickets (auto-archived by /exec)
-   • [cyan]docs/features/[/cyan] - Living documentation
-   • [cyan].claude/commands/[/cyan] - AI agents (socrates, plan, exec)
-   • [cyan].cdd/templates/[/cyan] - Internal templates
-
-🤖 [bold]Meet Socrates - Think Better, Document Faster[/bold]
-
-Stop writing specs alone. Socrates is your thinking partner:
-   ✓ Brainstorm through conversation, not forms
-   ✓ Uncover edge cases before they become bugs
-   ✓ Structure scattered thoughts into clear requirements
-   ✓ Stay focused on what matters
-
-Walk in with an idea. Walk out with a complete spec.
-
-🚀 [bold]Quick Start Workflow:[/bold]
-
-1. [yellow]Edit CLAUDE.md[/yellow] - Capture your project's context once, AI understands it forever
-   Tip: Brainstorm with [green]/socrates CLAUDE.md[/green] to build it together
-
-2. [yellow]Create a ticket:[/yellow] [green]cdd new feature user-auth[/green]
-   Generates a ticket in specs/tickets/
-
-3. [yellow]Gather requirements:[/yellow] [green]/socrates feature-user-auth[/green]
-   Brainstorm with Socrates - uncover edge cases, clarify scope, build complete specs
-
-4. [yellow]Generate plan:[/yellow] [green]/plan feature-user-auth[/green]
-   Clear spec → Detailed plan → Confident implementation
-
-5. [yellow]Implement:[/yellow] [green]/exec feature-user-auth[/green]
-   Clear spec + Detailed plan = AI builds exactly what you need (not what it guesses)
-
-📚 [bold]Learn More:[/bold]
-   [link]https://github.com/guilhermegouw/context-driven-documentation[/link]
-"""
-
     console.print(
         Panel(
-            next_steps,
-            title="✅ CDD Framework Initialized",
+            t.next_steps_content,
+            title=t.next_steps_title,
             border_style="green",
         )
     )
@@ -196,23 +163,22 @@ def feature(name):
     Examples:
         cdd new feature user-authentication
     """
-    console.print(
-        Panel.fit(
-            "🎫 [bold]Creating Feature Ticket[/bold]",
-            border_style="blue",
-        )
-    )
+    # Load config and translations
+    language = Config.get_language()
+    t = get_translations(language)
+
+    console.print(Panel.fit(t.ticket_creating_feature, border_style="blue"))
 
     try:
         result = create_new_ticket("feature", name)
         console.print()
-        _display_ticket_success(result)
+        _display_ticket_success(result, t)
         sys.exit(0)
     except TicketCreationError as e:
-        console.print(f"\n[red]❌ Error:[/red] {e}")
+        console.print(f"\n[red]❌ {t.error_title}:[/red] {e}")
         sys.exit(1)
     except Exception as e:
-        console.print(f"\n[red]❌ Unexpected error:[/red] {e}")
+        console.print(f"\n[red]❌ {t.error_unexpected}:[/red] {e}")
         sys.exit(1)
 
 

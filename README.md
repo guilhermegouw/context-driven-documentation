@@ -1,5 +1,7 @@
 # Context-Driven Documentation (CDD)
 
+> 🌐 **Português:** [Leia em Português (PT-BR)](README.pt-BR.md)
+
 [![PyPI version](https://badge.fury.io/py/cdd-claude.svg)](https://pypi.org/project/cdd-claude/)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)

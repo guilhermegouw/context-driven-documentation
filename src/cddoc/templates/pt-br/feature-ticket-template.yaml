@@ -1,0 +1,45 @@
+# Template de Ticket: Feature
+# Este template mostra a estrutura que o Socrates usa para especificações de features
+
+titulo: "[Título descritivo da feature]"
+
+historia_usuario: |
+  Como um [tipo de usuário],
+  Eu quero [capacidade ou feature],
+  Para que [benefício ou valor].
+
+valor_negocio: |
+  [Por que esta feature importa para o negócio]
+
+  Impacto no Negócio: [Impacto mensurável - receita, usuários, eficiência, etc.]
+
+criterios_aceitacao:
+  - [Critério específico e testável 1]
+  - [Critério específico e testável 2]
+  - [Critério específico e testável 3]
+  # Adicione quantos forem necessários para definir "pronto"
+
+escopo_implementacao:
+  frontend:
+    - [Componente ou mudança de UI 1]
+    - [Componente ou mudança de UI 2]
+  backend:
+    - [Endpoint de API ou serviço 1]
+    - [Endpoint de API ou serviço 2]
+  banco_de_dados:
+    - [Mudança de schema ou modelo de dados 1]
+    - [Mudança de schema ou modelo de dados 2]
+
+consideracoes_tecnicas: |
+  [Aspectos técnicos importantes que a equipe deve conhecer]
+  - Implicações de performance
+  - Preocupações de segurança
+  - Dependências de outros sistemas
+  - Riscos ou desafios
+
+ticket:
+  tipo: feature
+  prioridade: [high/medium/low]
+  esforco_estimado: [estimativa de tempo]
+  criado: [auto-generated]
+  atualizado: [auto-generated]

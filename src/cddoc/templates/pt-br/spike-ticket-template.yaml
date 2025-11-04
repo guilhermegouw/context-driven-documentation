@@ -1,0 +1,43 @@
+# Template de Ticket: Spike
+# Este template mostra a estrutura que o Socrates usa para spikes de pesquisa
+
+titulo: "[Pergunta ou área de investigação]"
+
+objetivo_pesquisa: |
+  **O Que Queremos Aprender:**
+  [A questão ou problema que precisa ser investigado]
+
+  **Por Que Isto Importa:**
+  [Como isto desbloqueia trabalho futuro ou informa decisões]
+
+questoes_investigacao:
+  - [Questão específica 1]
+  - [Questão específica 2]
+  - [Questão específica 3]
+  # Perguntas focadas que precisam de respostas
+
+criterios_sucesso:
+  - [Critério 1 - o que o sucesso parece]
+  - [Critério 2]
+  - [Critério 3]
+  # O que qualifica esta pesquisa como completa
+
+abordagem_pesquisa:
+  - [Método 1 - protótipos, testes, leitura de docs, etc.]
+  - [Método 2]
+  - [Método 3]
+
+limites_tempo:
+  caixa_de_tempo: [Quanto tempo alocar - ex: 2-4 horas, 1 dia]
+  prazo: [Quando as descobertas são necessárias]
+
+entregaveis_esperados:
+  - [Entregável 1 - relatório de descobertas, POC, recomendação, etc.]
+  - [Entregável 2]
+
+ticket:
+  tipo: spike
+  prioridade: [high/medium/low]
+  esforco_estimado: [estimativa de tempo]
+  criado: [auto-generated]
+  atualizado: [auto-generated]

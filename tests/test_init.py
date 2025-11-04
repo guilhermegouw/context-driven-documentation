@@ -6,12 +6,14 @@ import pytest
 from cddoc.init import (
     InitializationError,
     check_existing_structure,
+    create_config_file,
     create_directory_structure,
     generate_claude_md,
     initialize_project,
     install_framework_commands,
     install_templates,
     is_dangerous_path,
+    prompt_language_selection,
     validate_path,
 )
 
@@ -404,3 +406,173 @@ def test_gitkeep_files_created(tmp_path):
     # Check .gitkeep in user workspace directories
     assert (tmp_path / "specs" / "tickets" / ".gitkeep").exists()
     assert (tmp_path / "docs" / "features" / ".gitkeep").exists()
+
+
+# Language Selection Tests
+
+
+def test_create_config_file_english(tmp_path):
+    """Test that create_config_file creates correct config for English."""
+    # Create .cdd directory first
+    (tmp_path / ".cdd").mkdir(parents=True, exist_ok=True)
+
+    create_config_file(tmp_path, "en")
+
+    config_file = tmp_path / ".cdd" / "config.yaml"
+    assert config_file.exists()
+
+    content = config_file.read_text(encoding="utf-8")
+    assert "language: en" in content
+    assert "version: 1" in content
+
+
+def test_create_config_file_portuguese(tmp_path):
+    """Test that create_config_file creates correct config for Portuguese."""
+    # Create .cdd directory first
+    (tmp_path / ".cdd").mkdir(parents=True, exist_ok=True)
+
+    create_config_file(tmp_path, "pt-br")
+
+    config_file = tmp_path / ".cdd" / "config.yaml"
+    assert config_file.exists()
+
+    content = config_file.read_text(encoding="utf-8")
+    assert "language: pt-br" in content
+    assert "version: 1" in content
+
+
+def test_install_templates_english(tmp_path):
+    """Test that install_templates installs English templates."""
+    installed = install_templates(tmp_path, "en")
+
+    # Check that templates were installed
+    assert len(installed) > 0
+
+    # Check specific templates exist
+    templates_dir = tmp_path / ".cdd" / "templates"
+    assert (templates_dir / "feature-ticket-template.yaml").exists()
+    assert (templates_dir / "bug-ticket-template.yaml").exists()
+    assert (templates_dir / "constitution-template.md").exists()
+
+    # Check content is in English
+    feature_template = (
+        templates_dir / "feature-ticket-template.yaml"
+    ).read_text(encoding="utf-8")
+    assert "title:" in feature_template  # English field name
+
+
+def test_install_templates_portuguese(tmp_path):
+    """Test that install_templates installs Portuguese templates."""
+    installed = install_templates(tmp_path, "pt-br")
+
+    # Check that templates were installed
+    assert len(installed) > 0
+
+    # Check specific templates exist
+    templates_dir = tmp_path / ".cdd" / "templates"
+    assert (templates_dir / "feature-ticket-template.yaml").exists()
+    assert (templates_dir / "bug-ticket-template.yaml").exists()
+    assert (templates_dir / "constitution-template.md").exists()
+
+    # Check content is in Portuguese
+    feature_template = (
+        templates_dir / "feature-ticket-template.yaml"
+    ).read_text(encoding="utf-8")
+    assert "titulo:" in feature_template  # Portuguese field name
+
+
+def test_install_templates_only_selected_language(tmp_path):
+    """Test that only selected language templates are copied, not both."""
+    install_templates(tmp_path, "pt-br")
+
+    templates_dir = tmp_path / ".cdd" / "templates"
+
+    # Check no language subdirectories exist (flat structure)
+    assert not (templates_dir / "en").exists()
+    assert not (templates_dir / "pt-br").exists()
+
+    # Check templates are in flat structure
+    assert (templates_dir / "feature-ticket-template.yaml").exists()
+
+
+def test_prompt_language_selection_english(monkeypatch):
+    """Test that prompt_language_selection handles English selection."""
+    # Mock user input
+    monkeypatch.setattr("rich.console.Console.input", lambda self, prompt: "1")
+
+    language = prompt_language_selection()
+    assert language == "en"
+
+
+def test_prompt_language_selection_portuguese(monkeypatch):
+    """Test that prompt_language_selection handles Portuguese selection."""
+    # Mock user input
+    monkeypatch.setattr("rich.console.Console.input", lambda self, prompt: "2")
+
+    language = prompt_language_selection()
+    assert language == "pt-br"
+
+
+def test_prompt_language_selection_invalid_then_valid(monkeypatch):
+    """Test that prompt_language_selection handles invalid input then valid."""
+    # Mock user input - first invalid, then valid
+    inputs = iter(["3", "5", "1"])
+    monkeypatch.setattr(
+        "rich.console.Console.input", lambda self, prompt: next(inputs)
+    )
+
+    language = prompt_language_selection()
+    assert language == "en"
+
+
+def test_initialize_creates_config_yaml(tmp_path, monkeypatch):
+    """Test that initialize_project creates .cdd/config.yaml."""
+    # Mock language selection to return English
+    monkeypatch.setattr("cddoc.init.prompt_language_selection", lambda: "en")
+
+    initialize_project(str(tmp_path))
+
+    config_file = tmp_path / ".cdd" / "config.yaml"
+    assert config_file.exists()
+
+    content = config_file.read_text(encoding="utf-8")
+    assert "language: en" in content
+
+
+def test_initialize_installs_correct_language_templates(tmp_path, monkeypatch):
+    """Test that initialize_project installs only selected language templates."""
+    # Mock language selection to return Portuguese
+    monkeypatch.setattr(
+        "cddoc.init.prompt_language_selection", lambda: "pt-br"
+    )
+
+    initialize_project(str(tmp_path))
+
+    templates_dir = tmp_path / ".cdd" / "templates"
+
+    # Should have Portuguese templates
+    assert (templates_dir / "feature-ticket-template.yaml").exists()
+
+    # Check content is in Portuguese
+    content = (templates_dir / "feature-ticket-template.yaml").read_text(
+        encoding="utf-8"
+    )
+    assert "titulo:" in content  # Portuguese field name
+    assert "title:" not in content  # English field name should not exist
+
+
+def test_config_yaml_utf8_encoding(tmp_path):
+    """Test that config.yaml is created with UTF-8 encoding."""
+    # Create .cdd directory first
+    (tmp_path / ".cdd").mkdir(parents=True, exist_ok=True)
+
+    create_config_file(tmp_path, "pt-br")
+
+    config_file = tmp_path / ".cdd" / "config.yaml"
+
+    # Should be able to read with UTF-8
+    content = config_file.read_text(encoding="utf-8")
+    assert "language: pt-br" in content
+
+    # No encoding errors should occur
+    assert isinstance(content, str)

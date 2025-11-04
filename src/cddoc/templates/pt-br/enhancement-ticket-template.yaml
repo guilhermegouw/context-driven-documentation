@@ -1,0 +1,49 @@
+# Template de Ticket: Enhancement (Melhoria)
+# Este template mostra a estrutura que o Socrates usa para melhorias de features existentes
+
+titulo: "[Descrição da melhoria]"
+
+funcionalidade_atual: |
+  [Como a feature/sistema funciona atualmente]
+
+melhoria_proposta: |
+  [Como deveria funcionar após a melhoria]
+
+  **Mudanças Principais:**
+  - [Mudança 1]
+  - [Mudança 2]
+  - [Mudança 3]
+
+motivacao: |
+  **Por Que Esta Melhoria:**
+  [Qual problema ela resolve ou valor que adiciona]
+
+  **Impacto Esperado:**
+  [Benefícios mensuráveis - UX, performance, manutenibilidade, etc.]
+
+criterios_aceitacao:
+  - [Critério específico e testável 1]
+  - [Critério específico e testável 2]
+  - [Critério específico e testável 3]
+
+escopo_mudanca:
+  componentes_afetados:
+    - [Componente ou módulo 1]
+    - [Componente ou módulo 2]
+  compatibilidade_retroativa:
+    necessaria: [yes/no]
+    estrategia_migracao: [Se não for retrocompatível, como migrar]
+
+consideracoes_tecnicas: |
+  [Aspectos técnicos importantes]
+  - Impacto em sistemas existentes
+  - Dependências
+  - Riscos
+  - Estratégia de teste
+
+ticket:
+  tipo: enhancement
+  prioridade: [high/medium/low]
+  esforco_estimado: [estimativa de tempo]
+  criado: [auto-generated]
+  atualizado: [auto-generated]

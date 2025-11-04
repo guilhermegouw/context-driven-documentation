@@ -1,0 +1,35 @@
+# Template de Ticket: Bug
+# Este template mostra a estrutura que o Socrates usa para relatórios de bugs
+
+titulo: "[Descrição clara do bug]"
+
+descricao_problema: |
+  **Comportamento Atual:**
+  [O que está acontecendo que não deveria]
+
+  **Comportamento Esperado:**
+  [O que deveria estar acontecendo]
+
+passos_reproducao:
+  - [Passo 1 para reproduzir]
+  - [Passo 2 para reproduzir]
+  - [Passo 3 para reproduzir]
+  # Continue até o bug ser reproduzido
+
+avaliacao_impacto:
+  severidade: [critical/high/medium/low]
+  usuarios_afetados: [Quem é impactado - todos os usuários, papel específico, porcentagem]
+  solucao_alternativa: [Solução alternativa disponível, ou "Nenhuma conhecida"]
+  impacto_negocio: [Como isto afeta as operações de negócio]
+
+ambiente:
+  navegador: [Se aplicável]
+  so: [Se aplicável]
+  versao: [Versão da aplicação onde o bug ocorre]
+
+ticket:
+  tipo: bug
+  prioridade: [critical/high/medium/low]
+  criado: [auto-generated]
+  atualizado: [auto-generated]
+  reportado_por: [Quem reportou isto]

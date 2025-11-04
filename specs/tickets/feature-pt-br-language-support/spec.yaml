@@ -1,6 +1,6 @@
 # Feature: PT-BR Language Support
-# Status: In Progress - Partial specification
-# Continue with: /socrates pt-br-language-support
+# Status: Complete specification - Ready for implementation
+# Next step: /plan pt-br-language-support
 
 title: "PT-BR Language Support for CDD Framework"
 
@@ -10,75 +10,289 @@ user_story: |
   So that I and my team can create documentation, specifications, and plans in our native language.
 
 business_value: |
-  Enables adoption of CDD Framework at Brazilian company by providing native Portuguese support.
+  Enables adoption of CDD Framework at Brazilian companies by providing native Portuguese support.
   Makes the tool accessible and natural for Portuguese-speaking developers, improving their
   productivity and comfort with AI-assisted development.
 
   Business Impact: Unlocks Brazilian market adoption and team productivity for Portuguese speakers.
+  Critical for upcoming demo to Brazilian companies.
 
-key_decisions: |
-  Architecture decisions made during specification:
-  - Commands stay English (cdd new, cdd init), all output in Portuguese
-  - Interactive language selection during 'cdd init', stored in .cdd/config.yaml
-  - Simple approach: English + PT-BR only (not full i18n framework yet)
-  - Existing projects: manually edit config to switch language
-  - Templates fully translated (field names AND content in Portuguese)
-  - Auto-detect language from config, default to English if not set
-  - Slash commands detect language and respond accordingly (single file approach)
-  - File structure: translations/en.py, translations/pt_br.py, templates/en/, templates/pt-br/
+architecture_decisions: |
+  Language Separation Strategy:
+  - CLI commands stay English (cdd new, cdd init) - output translated to PT-BR
+  - AI conversation language matches user's writing (natural Claude behavior)
+  - Generated files use template language (PT-BR when configured)
+  - Config stored in .cdd/config.yaml, immutable after init
+
+  Key Technical Decisions:
+  1. Simple two-language approach - English + PT-BR only (not full i18n framework yet)
+  2. Interactive language selection during cdd init, stored in .cdd/config.yaml
+  3. Immutable language - Cannot change after init (simplifies implementation)
+  4. Config System - Singleton pattern to load config once per execution
+  5. Template Strategy - Copy only selected language templates to .cdd/templates/ (prevents model context pollution)
+  6. CLAUDE.md fully translated - Including examples with English commands + Portuguese comments
+  7. Language matching in slash commands - Prompt engineering to match user's language, not force PT-BR
+  8. Backward compatible - Old projects without config work in English + show informative warning
+
+  File Structure:
+    src/cddoc/
+    ├── translations/
+    │   ├── en.py           # English strings
+    │   └── pt_br.py        # Portuguese strings
+    ├── templates/
+    │   ├── en/             # English templates (in package)
+    │   └── pt-br/          # Portuguese templates (in package)
+    └── config.py           # Config singleton
+
+    .cdd/
+    ├── config.yaml         # language: pt-br or en
+    └── templates/          # Only selected language copied here
+        ├── feature-ticket-template.yaml
+        ├── bug-ticket-template.yaml
+        └── ...
 
 acceptance_criteria:
-  - [TO BE COMPLETED]
-  - Interactive language selection works during cdd init
-  - Config file correctly stores language preference
-  - All CLI output appears in Portuguese when language: pt-br is set
-  - Templates generate Portuguese content
-  - Slash commands (Socrates, Plan, Exec) converse in Portuguese
-  # More criteria to be added
+  initialization_and_configuration:
+    - cdd init displays bilingual prompt "Escolha o idioma / Choose language [1] English [2] Português (PT-BR)"
+    - User forced to select language (no silent default)
+    - After PT-BR selection, all subsequent messages display in Portuguese
+    - Configuration correctly saved to .cdd/config.yaml as "language pt-br"
+    - Language immutable after init (no change mechanism)
+
+  templates_translated:
+    - CLAUDE.md template fully in Portuguese (sections, instructions, placeholders)
+    - Command examples in English with explanatory comments in Portuguese
+    - All 4 ticket templates (feature, bug, spike, enhancement) in Portuguese
+    - All 3 plan templates (feature-plan, bug-plan, spike-plan) in Portuguese
+    - All doc templates (guide, feature) in Portuguese
+    - Only selected language templates copied to .cdd/templates/ during init
+
+  cli_output:
+    - All CLI messages (success, error, warnings, info) in Portuguese when language pt-br
+    - Rich UI (panels, tables, prompts) display text in Portuguese
+    - Interactive prompts in Portuguese
+    - Help text translated
+
+  slash_commands:
+    - /socrates responds in user's language (English if user writes English, PT-BR if user writes PT-BR)
+    - /socrates generates specs using PT-BR template when configured
+    - /plan responds in user's language, generates plans in PT-BR
+    - /exec responds in user's language during implementation
+    - /exec-auto output follows user's language
+    - /sync-docs responds in user's language
+
+  documentation:
+    - README.pt-BR.md created with complete translation
+    - README.md (English) remains as primary
+    - Cross-links between README.md and README.pt-BR.md
+
+  backward_compatibility:
+    - Projects without .cdd/config.yaml default to English
+    - Show warning "Config not found, using English. Run 'cdd init' to configure language"
+    - No breaking changes to existing projects
 
 implementation_scope:
-  cli:
-    - Add language selection prompt to cdd init
-    - Create .cdd/config.yaml with language setting
-    - Implement language auto-detection in all commands
-    - Translate all CLI messages and prompts
-  templates:
-    - Create templates/pt-br/ directory structure
-    - Translate all YAML templates (feature, bug, spike, enhancement)
-    - Translate all Markdown templates (guide, feature, constitution)
-    - [DECISION PENDING: Should CLAUDE.md be translated?]
-  translations:
-    - Create translations/en.py for English strings
-    - Create translations/pt_br.py for Portuguese strings
-    - Implement translation loader utility
-  slash_commands:
-    - Update Socrates to detect language and respond accordingly
-    - Update Plan to detect language and respond accordingly
-    - Update Exec to detect language and respond accordingly
-    - [Other slash commands to be identified]
+  translation_system:
+    - Create src/cddoc/translations/en.py with all English strings
+    - Create src/cddoc/translations/pt_br.py with all Portuguese strings
+    - Implement get_translations(language) helper function
+    - Map all existing CLI output points (console.print, Panel, Table, prompts)
+
+  config_system:
+    - Create src/cddoc/config.py with Config singleton class
+    - Implement Config.get_language() method
+    - Read from .cdd/config.yaml once per execution
+    - Fallback chain config.yaml → default (en)
+    - Cache in memory during execution
+
+  templates_portuguese_versions:
+    - Create src/cddoc/templates/pt-br/ directory structure (in package)
+    - Translate CLAUDE.md template (constitution-template.md)
+    - Translate 4 ticket templates (feature, bug, spike, enhancement)
+    - Translate 3 plan templates (feature-plan, bug-plan, spike-plan)
+    - Translate 2 doc templates (guide-doc, feature-doc)
+
+  update_cdd_init:
+    - Add language selection prompt (bilingual)
+    - Create .cdd/config.yaml with selected language
+    - Update install_templates() to copy only selected language templates
+    - Source from src/cddoc/templates/{language}/
+    - Destination .cdd/templates/ (no language subfolder)
+    - Update all init messages to use translation system
+
+  update_cli_commands:
+    - Refactor all CLI commands to use Config.get_language()
+    - Replace hardcoded strings with get_translations(language)
+    - Update all console.print(), Panel(), Table() calls
+    - Translate error messages, success messages, prompts
+    - Add backward compatibility warning for projects without config
+
+  update_slash_commands:
+    - Add language matching instructions to all 5 commands
+    - Update .claude/commands/socrates.md
+    - Update .claude/commands/plan.md
+    - Update .claude/commands/exec.md
+    - Update .claude/commands/exec-auto.md
+    - Update .claude/commands/sync-docs.md
+    - Instructions "Always respond in the same language the user writes"
+    - Update template loading logic to detect language from .cdd/config.yaml
+
+  documentation:
+    - Create README.pt-BR.md (complete translation)
+    - Add cross-reference links in both README files
+    - Document language selection process in both languages
+
+  rich_ui_text_mapping:
+    - CRITICAL FOR PLANNER Audit all CLI output points
+    - All console.print() in src/cddoc/cli.py
+    - All Panel(), Table(), interactive prompts
+    - Help text in Click commands
+    - Error handlers across all modules
+    - Success confirmations and progress messages
 
 technical_considerations: |
-  [TO BE COMPLETED IN NEXT SESSION]
-  - Need to handle encoding properly for Portuguese characters (UTF-8)
-  - Config file format and structure
-  - Backward compatibility for existing projects without language config
-  - Documentation for how to switch languages
+  1. Language Matching Risk (Highest Risk - Requires Manual Testing):
+     - Slash commands use prompt engineering to respond in user's language
+     - Claude may "leak" to Portuguese when reading PT-BR context (templates, CLAUDE.md)
+     - Mitigation: Explicit instructions at top of each slash command
+     - Validation: Extensive manual testing required (AI-driven feature)
+     - Fallback: If inconsistent, consider forcing language or deferring to v2
+     - Test scenarios: User writes English but context is PT-BR, and vice versa
+
+  2. UTF-8 Encoding:
+     - All files must use UTF-8 for Portuguese characters (ç, ã, õ, á, etc.)
+     - Python source files with PT-BR strings need proper encoding
+     - Template YAML/MD files specify encoding when reading/writing
+     - Ensure cross-platform compatibility (Windows, Linux, macOS)
+
+  3. Config System Architecture:
+     - Singleton pattern loads .cdd/config.yaml once per CLI execution
+     - Config accessible from all commands via Config.get_language()
+     - Slash commands read config.yaml directly (no access to Python singleton)
+     - Error handling for missing/malformed config files
+
+  4. Template Loading Logic:
+     - During init: Copy only selected language templates from package to project
+     - Source in package: src/cddoc/templates/{language}/
+     - Destination in project: .cdd/templates/ (flat structure)
+     - Handlers load from .cdd/templates/ (no language detection needed)
+     - Immutable language simplifies logic (no template migration)
+
+  5. Backward Compatibility Strategy:
+     - Projects without .cdd/config.yaml default to English silently
+     - Show informative warning about new language feature
+     - No breaking changes - old projects continue working
+     - No automatic migration - users must run cdd init --force to reconfigure
+
+  6. Rich UI Translation Points:
+     - ATTENTION FOR PLANNER: Must map all output locations
+     - CLI success/error/warning messages
+     - Rich panels (init summary, ticket creation confirmations)
+     - Tables (directory listings, component summaries)
+     - Interactive prompts (language selection, confirmations)
+     - Progress indicators and status messages
+     - Click command help text and descriptions
+
+  7. Slash Command Updates:
+     - All 5 commands need language matching instructions
+     - Template path loading must read from .cdd/config.yaml
+     - Maintain existing logic, only add instructions at top
+     - No forced language - respect user's writing language
+
+  8. Performance Considerations:
+     - Config loaded once per execution (singleton pattern)
+     - Minimal overhead for language detection
+     - No network calls or external dependencies
+     - Translation strings in-memory (Python imports)
+
+dependencies:
+  existing:
+    - PyYAML (parse .cdd/config.yaml)
+    - Rich (terminal UI - panels, tables, colors)
+    - Click (CLI framework)
+    - Python 3.9+ (type hints, pathlib, standard library)
+
+  development:
+    - pytest (unit testing)
+    - pytest-cov (test coverage)
+    - Black (code formatting)
+    - Ruff (linting)
+
+  external_tools:
+    - Git (already required by CDD framework)
+    - Claude Code (for slash commands - core requirement)
+
+  implementation_order:
+    - Translation system (en.py, pt_br.py)
+    - Config system (Config singleton)
+    - Translate all templates (10 files)
+    - Update cdd init (language selection)
+    - Update cdd new and other CLI commands
+    - Update slash commands (5 files)
+    - Create README.pt-BR.md
+    - Manual testing (especially language matching)
+
+success_metrics:
+  demo_readiness:
+    - Complete workflow demo runs in PT-BR without language inconsistencies
+    - All templates generate Portuguese content correctly
+    - Language matching works in 90%+ of manual test cases
+    - Zero UTF-8 encoding issues (special characters display correctly)
+
+  quality_gates:
+    - All unit tests passing (deterministic features)
+    - Manual testing checklist completed (AI features)
+    - Code formatted with Black
+    - Code passes Ruff checks
+    - No breaking changes to existing English-only projects
+
+  user_experience:
+    - Brazilian developers can complete full workflow in Portuguese
+    - Positive feedback from demo participants
+    - Seamless language selection during init
+    - Consistent Portuguese output across all CLI commands
+
+  technical_success:
+    - Config system works reliably
+    - Template loading system robust
+    - Backward compatibility verified
+    - Slash commands language matching validated
+
+effort_breakdown: |
+  Component Estimates:
+  - Translation system + Config: 2-3 days
+  - Template translation (10 files): 1-2 days
+  - Update cdd init: 1 day
+  - Update cdd new + CLI commands: 1 day
+  - Update slash commands: 1-2 days
+  - README.pt-BR.md: 0.5 day
+  - Manual testing (critical): 2-3 days
+
+  Total Estimated Effort: 9-12 days
+  Risk Buffer: +2 days for language matching iteration if needed
+
+testing_strategy: |
+  Deterministic Features (Unit Tests Required):
+  - Config singleton loading
+  - Translation system (get_translations)
+  - Template file copying during init
+  - CLI message formatting
+  - Backward compatibility (missing config)
+
+  AI-Driven Features (Manual Testing Checklist):
+  - Language matching: User writes English, context PT-BR → Claude responds English
+  - Language matching: User writes PT-BR, context PT-BR → Claude responds PT-BR
+  - Language matching: User switches languages mid-conversation
+  - Generated files use correct template language
+  - All slash commands handle both scenarios
+  - UTF-8 characters display correctly in all contexts
+  - Rich panels render correctly with Portuguese text
 
 ticket:
   type: feature
   priority: medium
-  estimated_effort: [TO BE ESTIMATED]
-  status: specification_in_progress
+  estimated_effort: 9-12 days
+  status: in_progress
   created: 2025-11-04
   updated: 2025-11-04
-
-notes: |
-  This specification was started on 2025-11-04 and is incomplete.
-  Continue the conversation with: /socrates pt-br-language-support
-
-  Next topics to cover:
-  - Should CLAUDE.md constitution template be translated?
-  - Complete acceptance criteria with specific, testable conditions
-  - Detailed implementation scope
-  - Technical considerations and risks
-  - Effort estimation
+  implementation_started: 2025-11-04T00:00:00
