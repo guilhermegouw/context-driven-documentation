@@ -1,0 +1,84 @@
+# Feature: PT-BR Language Support
+# Status: In Progress - Partial specification
+# Continue with: /socrates pt-br-language-support
+
+title: "PT-BR Language Support for CDD Framework"
+
+user_story: |
+  As a Brazilian software engineer using CDD Framework,
+  I want to interact with the framework in Portuguese (PT-BR),
+  So that I and my team can create documentation, specifications, and plans in our native language.
+
+business_value: |
+  Enables adoption of CDD Framework at Brazilian company by providing native Portuguese support.
+  Makes the tool accessible and natural for Portuguese-speaking developers, improving their
+  productivity and comfort with AI-assisted development.
+
+  Business Impact: Unlocks Brazilian market adoption and team productivity for Portuguese speakers.
+
+key_decisions: |
+  Architecture decisions made during specification:
+  - Commands stay English (cdd new, cdd init), all output in Portuguese
+  - Interactive language selection during 'cdd init', stored in .cdd/config.yaml
+  - Simple approach: English + PT-BR only (not full i18n framework yet)
+  - Existing projects: manually edit config to switch language
+  - Templates fully translated (field names AND content in Portuguese)
+  - Auto-detect language from config, default to English if not set
+  - Slash commands detect language and respond accordingly (single file approach)
+  - File structure: translations/en.py, translations/pt_br.py, templates/en/, templates/pt-br/
+
+acceptance_criteria:
+  - [TO BE COMPLETED]
+  - Interactive language selection works during cdd init
+  - Config file correctly stores language preference
+  - All CLI output appears in Portuguese when language: pt-br is set
+  - Templates generate Portuguese content
+  - Slash commands (Socrates, Plan, Exec) converse in Portuguese
+  # More criteria to be added
+
+implementation_scope:
+  cli:
+    - Add language selection prompt to cdd init
+    - Create .cdd/config.yaml with language setting
+    - Implement language auto-detection in all commands
+    - Translate all CLI messages and prompts
+  templates:
+    - Create templates/pt-br/ directory structure
+    - Translate all YAML templates (feature, bug, spike, enhancement)
+    - Translate all Markdown templates (guide, feature, constitution)
+    - [DECISION PENDING: Should CLAUDE.md be translated?]
+  translations:
+    - Create translations/en.py for English strings
+    - Create translations/pt_br.py for Portuguese strings
+    - Implement translation loader utility
+  slash_commands:
+    - Update Socrates to detect language and respond accordingly
+    - Update Plan to detect language and respond accordingly
+    - Update Exec to detect language and respond accordingly
+    - [Other slash commands to be identified]
+
+technical_considerations: |
+  [TO BE COMPLETED IN NEXT SESSION]
+  - Need to handle encoding properly for Portuguese characters (UTF-8)
+  - Config file format and structure
+  - Backward compatibility for existing projects without language config
+  - Documentation for how to switch languages
+
+ticket:
+  type: feature
+  priority: medium
+  estimated_effort: [TO BE ESTIMATED]
+  status: specification_in_progress
+  created: 2025-11-04
+  updated: 2025-11-04
+
+notes: |
+  This specification was started on 2025-11-04 and is incomplete.
+  Continue the conversation with: /socrates pt-br-language-support
+
+  Next topics to cover:
+  - Should CLAUDE.md constitution template be translated?
+  - Complete acceptance criteria with specific, testable conditions
+  - Detailed implementation scope
+  - Technical considerations and risks
+  - Effort estimation
