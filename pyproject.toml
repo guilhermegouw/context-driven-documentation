@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "cdd-claude"
-version = "0.1.2"
+version = "0.1.4"
 description = "AI-first development framework for Claude Code - conversational specs, autonomous planning, context-aware implementation"
 authors = ["Guilherme Gouw <guilherme.gouw@gmail.com>"]
 license = "MIT"
