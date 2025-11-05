@@ -102,11 +102,10 @@ Write file
 
 **Context Loading System:**
 - **Step 1**: Load CLAUDE.md (project foundation)
-- **Step 2**: Read target file (current state)
+- **Step 2**: Read target file (current state with template structure)
 - **Step 3**: Determine file type from path pattern
-- **Step 4**: Load appropriate template
-- **Step 5**: Intelligent reconnaissance (related context)
-- **Step 6**: Synthesize and present findings
+- **Step 4**: Intelligent reconnaissance (related context)
+- **Step 5**: Synthesize and present findings
 
 **Progressive Clarification Engine:**
 - Acknowledges what's clear: "✅ Clear: [summary]"
@@ -319,7 +318,7 @@ Next steps: Use `/plan user-auth` to create implementation plan
 
 ### 1. Initialization Phase
 
-**Intelligent Context Loading (6 Steps):**
+**Intelligent Context Loading (5 Steps):**
 
 **Step 1: Load Project Foundation**
 - Reads CLAUDE.md to understand project world
@@ -327,8 +326,9 @@ Next steps: Use `/plan user-auth` to create implementation plan
 - Provides lens to interpret everything else
 
 **Step 2: Read Target File**
-- Examines current state of the file
+- Examines current state of the file (includes full template structure from `cdd new`)
 - Identifies what exists and what's missing
+- Template structure guides what sections need completion
 - Determines starting point for conversation
 
 **Step 3: Determine File Type**
@@ -336,19 +336,14 @@ Next steps: Use `/plan user-auth` to create implementation plan
 - Identifies: ticket type, documentation type, or constitution
 - Selects appropriate conversation approach
 
-**Step 4: Load Appropriate Template**
-- For tickets: `.cdd/templates/[type]-ticket-template.yaml`
-- For docs: `.cdd/templates/[type]-doc-template.md`
-- Understands what a complete document needs
-
-**Step 5: Intelligent Reconnaissance**
+**Step 4: Intelligent Reconnaissance**
 - For features: Looks for similar features or related code
 - For bugs: Examines broken code if path provided
 - For spikes: Checks for previous research
 - Gathers relevant context automatically
 
-**Step 6: Synthesize and Present Context**
-- Summarizes project, file type, template structure
+**Step 5: Synthesize and Present Context**
+- Summarizes project, file type, target file structure
 - Highlights related context found
 - Shares key insights that affect this work
 - Sets stage for intelligent conversation

@@ -115,9 +115,9 @@ ticket:
 
 Based on ticket type:
 
-- Feature → Read `.cddoc/templates/feature-plan-template.md`
-- Bug → Read `.cddoc/templates/bug-plan-template.md`
-- Spike → Read `.cddoc/templates/spike-plan-template.md`
+- Feature → Read `.cdd/templates/feature-plan-template.md`
+- Bug → Read `.cdd/templates/bug-plan-template.md`
+- Spike → Read `.cdd/templates/spike-plan-template.md`
 
 **Purpose:** Understand the structure you'll populate
 
@@ -834,7 +834,7 @@ Should I proceed with a generic plan, or would you like to set up CLAUDE.md firs
 ```markdown
 ❌ Error: Plan template not found
 
-Expected: `.cddoc/templates/[feature|bug|spike]-plan-template.md`
+Expected: `.cdd/templates/[feature|bug|spike]-plan-template.md`
 Found: [None]
 
 This might mean:

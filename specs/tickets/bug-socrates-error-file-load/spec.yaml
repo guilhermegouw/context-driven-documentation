@@ -1,0 +1,99 @@
+# Bug Ticket - Socrates Template Loading Error
+# This bug was discovered during normal Socrates usage
+
+title: "Socrates fails to load template files due to incorrect hardcoded paths"
+
+problem_description: |
+  **Current Behavior:**
+  During Socrates initialization (Step 4), it attempts to load template files from incorrect paths:
+  - Looks for `.cddoc/templates/feature.yaml` (directory typo: `.cddoc` instead of `.cdd`)
+  - Looks for `.cdd/templates/bug.yaml` (wrong filename: missing `-ticket-template` suffix)
+
+  When template loading fails, Socrates displays "Error reading file" but continues the conversation normally.
+
+  **Expected Behavior:**
+  Either:
+  1. Socrates successfully loads template files from correct paths: `.cdd/templates/[type]-ticket-template.yaml`, OR
+  2. Step 4 template loading is removed entirely if redundant (target file already loaded in Step 2)
+
+  **Key Context:**
+  When `cdd new bug name` runs, it stamps the template structure into the target spec file. Socrates already
+  loads this target file in Step 2 of initialization, which includes the full template structure (either empty
+  or partially filled). This makes separate template loading in Step 4 potentially redundant.
+
+reproduction_steps:
+  - Run `cdd init` and select any language (en or pt-br)
+  - Create a new ticket: `cdd new bug test-bug`
+  - Invoke Socrates: `/socrates specs/tickets/bug-test-bug/spec.yaml`
+  - Observe the initialization output showing template load errors in Step 4
+  - Note that Socrates continues conversation successfully with good outcomes
+
+impact_assessment:
+  severity: low
+  affected_users: All users running Socrates on version 0.1.4
+  workaround: None needed - Socrates functions correctly despite error
+  business_impact: |
+    - Minimal user impact - Socrates produces comprehensive specs successfully
+    - Creates confusing error messages during initialization
+    - May indicate unnecessary complexity in the initialization process
+    - Template structure is already available via target file loaded in Step 2
+
+environment:
+  browser: N/A (CLI tool)
+  os: All platforms (Linux, macOS, Windows)
+  version: CDD Framework 0.1.4
+  component: Intelligence Layer - Socrates slash command
+
+investigation_notes: |
+  **Root Causes Identified:**
+  1. Directory name typo: `.cddoc` used instead of `.cdd`
+  2. Filename pattern mismatch: Hardcoded paths use `[type].yaml` but actual files are named `[type]-ticket-template.yaml`
+
+  **Critical Discovery:**
+  The target file (loaded in Step 2) already contains the complete template structure because `cdd new` stamps
+  it during file creation. This means Step 4's separate template loading may be redundant.
+
+  **Investigation Scope for Planner:**
+
+  PRIORITY: Evaluate whether Step 4 template loading adds any value
+  - Target file is already loaded in Step 2 with full template structure
+  - Template may be empty or partially filled, but structure is present
+  - Does loading the template separately provide any additional context or value?
+  - Is this just technical debt that should be removed?
+
+  **If Step 4 adds value:**
+  1. Fix hardcoded paths in all Socrates command files
+  2. Audit `/plan` and other commands for similar issues
+
+  **If Step 4 is redundant:**
+  1. Remove Step 4 template loading from Socrates initialization
+  2. Update documentation to reflect 5-step process instead of 6-step
+  3. Clean up template loading code
+
+  **Files Potentially Affected:**
+  - src/cddoc/commands/en/socrates.md
+  - src/cddoc/commands/pt-br/socrates.md
+  - /plan command files (if similar pattern exists)
+  - docs/features/socrates.md (if Step 4 is removed)
+
+  **Actual Template Structure:**
+  ```
+  .cdd/
+  ├── templates/
+  │   ├── bug-ticket-template.yaml
+  │   ├── feature-ticket-template.yaml
+  │   ├── spike-ticket-template.yaml
+  │   ├── enhancement-ticket-template.yaml
+  │   ├── [type]-plan-template.md
+  │   ├── feature-doc-template.md
+  │   ├── guide-doc-template.md
+  │   └── constitution-template.md
+  └── config.yaml
+  ```
+
+ticket:
+  type: bug
+  priority: low
+  created: 2025-11-05
+  updated: 2025-11-05
+  reported_by: guilhermegouw
