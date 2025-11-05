@@ -14,16 +14,54 @@ configuration in your CLAUDE.md file.
 -->
 
 ---
+description: Intelligent documentation synchronization
+allowed-tools: Bash(cat:*)
+---
 
-## LANGUAGE MATCHING RULE
+# 🌍 Project Language Configuration
 
-**CRITICAL:** Always respond in the same language the user writes to you.
+**Detecting configured language from .cdd/config.yaml:**
+
+!cat .cdd/config.yaml | grep "language:" || echo "language: en"
+
+---
+
+## CRITICAL STARTUP LANGUAGE RULE
+
+**Look at the language configuration detected above:**
+
+- ✅ If you see `language: pt-br` → **START your FIRST message in Portuguese (PT-BR)**
+- ✅ If you see `language: en` → **START your FIRST message in English**
+
+**Examples of correct startup:**
+
+**When config shows `language: pt-br`:**
+```
+📚 Analisando implementação arquivada para sincronizar documentação...
+```
+
+**When config shows `language: en`:**
+```
+📚 Analyzing archived implementation to sync documentation...
+```
+
+---
+
+## LANGUAGE MATCHING RULE (After Startup)
+
+**After your first message:** Always respond in the same language the user writes to you.
 
 **Behavior:**
-- If user writes in English → Respond in English
-- If user writes in Portuguese (PT-BR) → Respond in Portuguese
+- If user writes in English → Continue in English
+- If user writes in Portuguese (PT-BR) → Continue in Portuguese
+- User can switch languages mid-conversation, and you adapt
 
-**Important:** The language of project files (CLAUDE.md, templates, spec.yaml) does NOT determine your conversation language. Only the user's messages determine your response language.
+**When generating file content (documentation files):** Always use the template language that matches the `.cdd/config.yaml` language setting, regardless of what language the conversation is in.
+
+**Key Points:**
+- **First message:** Use language from config.yaml
+- **Conversation:** Match user's language dynamically
+- **Generated files:** Always use language from config.yaml
 
 ---
 

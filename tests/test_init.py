@@ -18,8 +18,9 @@ from cddoc.init import (
 )
 
 
-def test_initialize_project_creates_structure(tmp_path):
+def test_initialize_project_creates_structure(tmp_path, monkeypatch):
     """Test that initialize_project creates all required directories and files."""
+    monkeypatch.setattr("cddoc.init.prompt_language_selection", lambda: "en")
     result = initialize_project(str(tmp_path))
 
     # Check directories (new structure)
@@ -68,8 +69,9 @@ def test_initialize_project_creates_structure(tmp_path):
     assert result["existing_structure"] is False
 
 
-def test_claude_md_content(tmp_path):
+def test_claude_md_content(tmp_path, monkeypatch):
     """Test CLAUDE.md content is correct."""
+    monkeypatch.setattr("cddoc.init.prompt_language_selection", lambda: "en")
     initialize_project(str(tmp_path))
 
     claude_md = tmp_path / "CLAUDE.md"
@@ -84,8 +86,9 @@ def test_claude_md_content(tmp_path):
     assert "## Team Conventions" in content
 
 
-def test_framework_commands_installed(tmp_path):
+def test_framework_commands_installed(tmp_path, monkeypatch):
     """Test that framework commands are properly installed."""
+    monkeypatch.setattr("cddoc.init.prompt_language_selection", lambda: "en")
     initialize_project(str(tmp_path))
 
     commands_dir = tmp_path / ".claude" / "commands"
@@ -108,8 +111,9 @@ def test_framework_commands_installed(tmp_path):
     assert len(socrates_content) > 1000  # Should be substantial
 
 
-def test_templates_installed(tmp_path):
+def test_templates_installed(tmp_path, monkeypatch):
     """Test that templates are properly installed."""
+    monkeypatch.setattr("cddoc.init.prompt_language_selection", lambda: "en")
     initialize_project(str(tmp_path))
 
     templates_dir = tmp_path / ".cdd" / "templates"
@@ -131,8 +135,9 @@ def test_templates_installed(tmp_path):
     assert (templates_dir / "feature-doc-template.md").exists()
 
 
-def test_initialize_existing_structure(tmp_path):
+def test_initialize_existing_structure(tmp_path, monkeypatch):
     """Test that initialization handles existing structure gracefully."""
+    monkeypatch.setattr("cddoc.init.prompt_language_selection", lambda: "en")
     # First initialization
     result1 = initialize_project(str(tmp_path))
     assert result1["claude_md_created"] is True
@@ -144,8 +149,9 @@ def test_initialize_existing_structure(tmp_path):
     assert result2["existing_structure"] is True
 
 
-def test_initialize_with_force_flag(tmp_path):
+def test_initialize_with_force_flag(tmp_path, monkeypatch):
     """Test that force flag overwrites existing files."""
+    monkeypatch.setattr("cddoc.init.prompt_language_selection", lambda: "en")
     # First initialization
     initialize_project(str(tmp_path))
 
@@ -218,7 +224,7 @@ def test_install_framework_commands(tmp_path):
     commands_dest.mkdir(parents=True)
 
     # Install commands
-    installed = install_framework_commands(tmp_path)
+    installed = install_framework_commands(tmp_path, "en")
 
     # Verify all commands installed
     assert len(installed) == 4
@@ -241,7 +247,7 @@ def test_install_templates(tmp_path):
     templates_dest.mkdir(parents=True)
 
     # Install templates
-    installed = install_templates(tmp_path)
+    installed = install_templates(tmp_path, "en")
 
     # Should have at least 8 templates (3 ticket + 3 plan + constitution + feature-doc)
     assert len(installed) >= 8
@@ -257,7 +263,7 @@ def test_generate_claude_md(tmp_path):
     # Create templates directory and template
     templates_dir = tmp_path / ".cdd" / "templates"
     templates_dir.mkdir(parents=True)
-    install_templates(tmp_path)
+    install_templates(tmp_path, "en")
 
     # Generate CLAUDE.md
     result = generate_claude_md(tmp_path)
@@ -277,7 +283,7 @@ def test_generate_claude_md_skip_existing(tmp_path):
     # Create templates directory
     templates_dir = tmp_path / ".cdd" / "templates"
     templates_dir.mkdir(parents=True)
-    install_templates(tmp_path)
+    install_templates(tmp_path, "en")
 
     # Create existing CLAUDE.md
     claude_md = tmp_path / "CLAUDE.md"
@@ -325,8 +331,9 @@ def test_validate_path_no_permission(tmp_path):
         no_write.chmod(0o755)
 
 
-def test_initialize_nonexistent_directory(tmp_path):
+def test_initialize_nonexistent_directory(tmp_path, monkeypatch):
     """Test initialization creates directory if it doesn't exist."""
+    monkeypatch.setattr("cddoc.init.prompt_language_selection", lambda: "en")
     new_dir = tmp_path / "new-project"
     assert not new_dir.exists()
 
@@ -336,8 +343,9 @@ def test_initialize_nonexistent_directory(tmp_path):
     assert result["path"] == new_dir
 
 
-def test_directory_hierarchy_correct(tmp_path):
+def test_directory_hierarchy_correct(tmp_path, monkeypatch):
     """Test that all directories are created in correct hierarchy."""
+    monkeypatch.setattr("cddoc.init.prompt_language_selection", lambda: "en")
     initialize_project(str(tmp_path))
 
     # specs structure
@@ -357,8 +365,9 @@ def test_directory_hierarchy_correct(tmp_path):
     assert (tmp_path / ".cdd" / "templates").is_dir()
 
 
-def test_files_have_correct_content_structure(tmp_path):
+def test_files_have_correct_content_structure(tmp_path, monkeypatch):
     """Test that created files have proper structure."""
+    monkeypatch.setattr("cddoc.init.prompt_language_selection", lambda: "en")
     initialize_project(str(tmp_path))
 
     # CLAUDE.md should have all sections
@@ -378,8 +387,9 @@ def test_files_have_correct_content_structure(tmp_path):
         ), f"Section '{section}' missing from CLAUDE.md"
 
 
-def test_initialize_result_format(tmp_path):
+def test_initialize_result_format(tmp_path, monkeypatch):
     """Test that initialize_project returns correct result format."""
+    monkeypatch.setattr("cddoc.init.prompt_language_selection", lambda: "en")
     result = initialize_project(str(tmp_path))
 
     # Check all expected keys are present
@@ -399,8 +409,9 @@ def test_initialize_result_format(tmp_path):
     assert isinstance(result["existing_structure"], bool)
 
 
-def test_gitkeep_files_created(tmp_path):
+def test_gitkeep_files_created(tmp_path, monkeypatch):
     """Test that .gitkeep files are created in empty directories."""
+    monkeypatch.setattr("cddoc.init.prompt_language_selection", lambda: "en")
     initialize_project(str(tmp_path))
 
     # Check .gitkeep in user workspace directories

@@ -178,33 +178,37 @@ def create_directory_structure(base_path: Path) -> List[str]:
     return created
 
 
-def install_framework_commands(base_path: Path) -> List[str]:
-    """Copy framework command files to .claude/commands/.
+def install_framework_commands(base_path: Path, language: str) -> List[str]:
+    """Copy framework command files to .claude/commands/ in selected language.
 
     Args:
         base_path: Base directory for project
+        language: Language code ('en' or 'pt-br')
 
     Returns:
         List of installed command files
     """
-    commands_source = Path(__file__).parent / "commands"
-    commands_dest = base_path / ".claude" / "commands"
+    # Get source commands directory from package (same pattern as templates)
+    package_dir = Path(__file__).parent
+    source_commands = package_dir / "commands" / language
 
-    command_files = [
-        "socrates.md",
-        "plan.md",
-        "exec.md",
-        "exec-auto.md",
-    ]
+    if not source_commands.exists():
+        raise InitializationError(
+            f"Commands not found for language: {language}"
+        )
+
+    # Target: .claude/commands/ (flat structure, no language subfolder)
+    target_commands = base_path / ".claude" / "commands"
+    target_commands.mkdir(parents=True, exist_ok=True)
 
     installed = []
-    for cmd_file in command_files:
-        source = commands_source / cmd_file
-        dest = commands_dest / cmd_file
 
-        if source.exists():
-            shutil.copy2(source, dest)
-            installed.append(f".claude/commands/{cmd_file}")
+    # Copy all command files
+    for command_file in source_commands.glob("*.md"):
+        if command_file.is_file():
+            target_file = target_commands / command_file.name
+            shutil.copy2(command_file, target_file)
+            installed.append(f".claude/commands/{command_file.name}")
 
     return installed
 
@@ -388,7 +392,7 @@ def initialize_project(
     create_config_file(target_path, language)
 
     # Install commands and templates
-    installed_commands = install_framework_commands(target_path)
+    installed_commands = install_framework_commands(target_path, language)
     installed_templates = install_templates(target_path, language)
     claude_md_created = generate_claude_md(target_path, force)
 
